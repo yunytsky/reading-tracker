@@ -7,7 +7,6 @@ import usersRoutes from "./routes/users.js";
 
 // Configurations
 const app = express();  
-dotenv.config();
 
 // Middleware
 app.use(express.json());
