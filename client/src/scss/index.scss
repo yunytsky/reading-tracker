@@ -1,0 +1,79 @@
+//Reset
+@import "reset";
+//--------------------
+//Colors
+@import "colors";
+//--------------------
+//Typography
+@import "typography";
+//--------------------
+//Styles
+html {
+  height: 100%;
+}
+body {
+  color: $black;
+}
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo{
+  display: flex;
+  align-items: center;
+  font-weight: 800;
+  font-size: 1.25rem;
+  img{
+    margin-right: 4px;
+  }
+}
+
+.header{
+  display: flex;
+  align-items: center;
+  padding: 1em 2em;
+  border-bottom: 1px solid $black-10;
+  .logo{
+    margin-right: 2em;
+  }
+}
+
+.header-nav{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  a{
+    @include link-2;
+    color: $black-75;
+  }
+}
+
+.header-nav-left{
+  a:first-child{
+    margin-right: 1.75em;
+  }
+}
+
+.login, .signup{
+  padding: 3em 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  h3{
+    margin-bottom: 1.5em;
+  }
+}
+
+//--------------------
+@import "forms";
+@import "buttons";
+
+//--------------------
+
+//Media queries
+@import "media";
+//--------------------

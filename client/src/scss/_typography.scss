@@ -1,0 +1,115 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
+//--------------------
+body {
+  font-family: "Poppins", sans-serif;
+}
+//--------------------
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+}
+
+h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+h5 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+h6 {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+//--------------------
+@mixin medium {
+  font-weight: 500;
+}
+
+@mixin semibold {
+  font-weight: 600;
+}
+
+//--------------------
+@mixin body-1 {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@mixin body-2 {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+@mixin body-3 {
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+@mixin body-4 {
+  font-size: 0.625rem;
+  line-height: 1.5;
+}
+//--------------------
+@mixin button-1 {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@mixin button-2 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+@mixin button-3 {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@mixin button-3 {
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+//--------------------
+@mixin link-1 {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+@mixin link-2 {
+  font-size: 0.875rem;
+  line-height: 1.2;
+}
+
+@mixin link-3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+

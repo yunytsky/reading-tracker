@@ -4,12 +4,15 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import usersRoutes from "./routes/users.js";
+import cookieParser from "cookie-parser";
 
 // Configurations
 const app = express();  
 
 // Middleware
 app.use(express.json());
+app.use(cors({origin: "http://localhost:5173"}));
+app.use(cookieParser());
 
 // Routes
 app.use("/auth", authRoutes);

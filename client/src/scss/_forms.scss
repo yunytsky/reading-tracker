@@ -1,0 +1,60 @@
+.login-form, .signup-form{
+    display: flex;
+    flex-direction: column;
+    .button{
+        @include button-1;
+        padding: .5em 1.5em;
+        margin: 2em auto .75em auto;
+    }
+}
+
+.form-input{
+    width: 25em;
+    border: 1px solid $black-10;
+    border-radius: 4px;
+    padding: .65em;
+    margin-bottom: 1.5em;
+    &:hover{
+        border: 1px solid $black-25;
+    }
+    &:focus{
+        border: 1px solid $primary;
+    }
+    &:active{
+        border: 1px solid $primary;
+    }
+    &:disabled{
+        background-color: $black-5;
+        border: 1px solid $black-10;
+    }
+}
+
+
+.form-label{
+    @include body-2;
+    margin-bottom: .5em;
+}
+
+.form-auxiliary-link{
+    margin: 0 auto;
+    @include body-2;
+    color: $black-50;
+    a{
+        @include link-2;
+        @include medium;
+    }
+}
+
+.form-error{
+    color: $red;
+    @include body-3;
+    margin-top: -1.5em;
+    margin: -1.5em 0 1.5em 0;
+}
+
+.form-submit-error{
+    color: $red;
+    @include body-2;
+    text-align: center;
+    margin: -.5em 0 .5em 0;
+}
