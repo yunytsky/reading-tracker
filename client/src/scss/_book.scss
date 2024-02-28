@@ -1,0 +1,22 @@
+.book-entry{
+    cursor: pointer;
+    border: 1px solid $black-10;
+    border-radius: 8px;
+    box-shadow: $shadow-main;
+    padding: 1em;
+}
+
+.book-entry-author{
+    @include body-3;
+}
+
+.book-entry-status{
+    @include body-4;
+    @include medium;
+    color: $black-50;
+    background-color: $black-5;
+    border-radius: 100px;
+    padding: .5em;
+    text-align: center;
+    max-width: 8em;
+}

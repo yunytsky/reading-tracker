@@ -2,13 +2,14 @@ import {RouterProvider, createBrowserRouter, createRoutesFromElements, Route} fr
 import Login from "./views/Login";
 import Signup from "./views/Signup";
 import AppLayout from "./layouts/AppLayout";
+import Library from "./views/Library";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<AppLayout/>}>
       <Route path="login" element={<Login/>}/>
       <Route path="signup" element={<Signup/>}/>
-
+      <Route path="library" element={<Library/>}/>
     </Route>
   )
 )

@@ -14,4 +14,4 @@ const BookEntry = () => {
     );
 };
 
-export default Header;
+export default BookEntry;

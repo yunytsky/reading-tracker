@@ -1,12 +1,12 @@
 import { loginSchema } from "../../schemas";
 import {useFormik} from "formik";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api";
 
 const LoginForm = () => {
     const [submitError, setSubmitError] = useState({error: false, message: ""});
-
+    const navigate = useNavigate();
     const onSubmit = async (values, actions) => {
       try {        
         if(submitError){
@@ -14,9 +14,10 @@ const LoginForm = () => {
         }
 
         const data = await login(values);
-        actions.resetForm();
 
-        //navigate to the app
+        actions.resetForm();
+        navigate("/");
+
       } catch (error) {
         if(error.response.data.message){
           setSubmitError({error: true, message: error.response.data.message})

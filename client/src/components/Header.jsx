@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import logo from "../assets/logo.svg";
 
 const Header = () => {
@@ -10,11 +10,11 @@ const Header = () => {
             </div>
             <nav className="header-nav">
                 <div className="header-nav-left">
-                    <Link>Library</Link>
-                    <Link>Review</Link>
+                    <NavLink to="/library" className={({ isActive }) => (isActive ? "active" : "")}>Library</NavLink>
+                    <NavLink to="/review" className={({ isActive }) => (isActive ? "active" : "")}>Review</NavLink>
                 </div>
                 <div className="header-nav-right">
-                    <Link>Profile</Link>
+                    <NavLink to="/profile" className={({ isActive }) => (isActive ? "active" : "")}>Profile</NavLink>
                 </div>
             </nav>
 

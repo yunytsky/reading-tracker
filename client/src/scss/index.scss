@@ -49,6 +49,11 @@ body {
     @include link-2;
     color: $black-75;
   }
+
+  a.active{
+    color: $black;
+    @include medium;
+  }
 }
 
 .header-nav-left{
@@ -58,7 +63,7 @@ body {
 }
 
 .login, .signup{
-  padding: 3em 1em;
+  padding: 3em 2em;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -68,10 +73,18 @@ body {
   }
 }
 
+.library{
+  padding: 2em 4em;
+  h3{
+    margin-bottom: 1em;
+  }
+}
+
+
 //--------------------
 @import "forms";
 @import "buttons";
-
+@import "book";
 //--------------------
 
 //Media queries
