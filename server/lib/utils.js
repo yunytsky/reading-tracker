@@ -28,8 +28,8 @@ export function issueJWT(user){
         iat: Date.now()
     };
 
-    const signedToken = jsonwebtoken.sign(payload, process.env.SECRET, {expiresIn: "7d", algorithm: "HS256"});
-    return {token: `Bareer ${signedToken}`};
+    const token = jsonwebtoken.sign(payload, process.env.SECRET, {expiresIn: "7d", algorithm: "HS256"});
+    return token;
 }
 
 //Generate verification code

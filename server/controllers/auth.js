@@ -40,9 +40,18 @@ export async function login(req, res) {
         if(!match){
             return res.status(401).json({error: true, message: "Wrong credentials"});
         }
-        const jwt = issueJWT(user);
-        return res.status(200).json({ error: false, message: "Successfully authorized", token: jwt.token});
+        const token = issueJWT(user);
+
+        return res.status(200).cookie("token", token, {httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000}).json({ error: false, message: "Successfully authorized"});
     
+    } catch (error) {
+        return res.status(500).json({ error: true, message: error.message });
+    }
+}
+
+export async function logout(req, res) {
+    try {
+        return res.status(200).clearCookie("token").json({error: false, message: "Successfully logged out"})
     } catch (error) {
         return res.status(500).json({ error: true, message: error.message });
     }
