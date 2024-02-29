@@ -112,12 +112,18 @@ export function getBookOwner(bookId) {
     return pool.execute(`
         SELECT userId FROM books
         WHERE bookId = ?
-    `, [bookId])
+    `, [bookId]);
 }
 
 export function deleteBookEntry(bookId) {
     return pool.execute(`
         DELETE FROM books 
         WHERE bookId = ?
-    `, [bookId])
+    `, [bookId]);
+}
+
+export function getColors() {
+    return pool.execute(`
+        SELECT * FROM colors;
+    `);
 }

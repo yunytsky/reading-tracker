@@ -3,7 +3,7 @@ import { getUserBooks, getUserBook, addBookEntry, editBookEntry, getBookOwner, d
 export async function getBooks(req, res) {
     try {
         const [books] = await getUserBooks(req.user.sub);
-        return res.status(200).json({error: false, books: books});
+        return res.status(200).json({error: false, message: "Success", books: books});
     } catch (error) {
         return res.status(500).json({error: true, message: error.message});
     }
@@ -20,7 +20,7 @@ export async function getBook(req, res) {
 
         const [bookAuthors] = await getBookAuthors(req.params.bookId);
     
-        return res.status(200).json({error: false, book: book, bookAuthors: bookAuthors});
+        return res.status(200).json({error: false, message: "Success", book: book, bookAuthors: bookAuthors});
     } catch (error) {
         return res.status(500).json({error: true, message: error.message});
     }
@@ -29,7 +29,7 @@ export async function getBook(req, res) {
 export async function addBook(req, res) {
     try {
         const [data] = await addBookEntry(req.user.sub, req.body.name)
-        return res.status(201).json({error: false, book: data.insertId})
+        return res.status(201).json({error: false, message: "Success", book: data.insertId})
     } catch (error) {
         return res.status(500).json({error: true, message: error.message});
     } 
