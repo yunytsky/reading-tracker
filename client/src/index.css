@@ -345,4 +345,5 @@ body {
   padding: 0.5em;
   text-align: center;
   max-width: 8em;
+  text-transform: capitalize;
 }

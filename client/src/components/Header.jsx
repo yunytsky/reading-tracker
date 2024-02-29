@@ -1,13 +1,13 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/logo.svg";
 
 const Header = () => {
     return(
         <header className="header">
-            <div className="logo">
+            <Link to="/library" className="logo">
                 <img src={logo}/>
                 LitLog
-            </div>
+            </Link>
             <nav className="header-nav">
                 <div className="header-nav-left">
                     <NavLink to="/library" className={({ isActive }) => (isActive ? "active" : "")}>Library</NavLink>

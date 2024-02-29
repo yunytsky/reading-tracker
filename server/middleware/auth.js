@@ -1,9 +1,8 @@
 import jwt from "jsonwebtoken";
 
 export function verifyJWT (req, res, next) {
-
-   // const token = req.cookies.token;
    const token = req.cookies.token;
+   
    if(!token){
       return res.status(401).json({error: true, message: "Not authorized"});
    }

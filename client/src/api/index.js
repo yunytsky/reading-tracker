@@ -1,23 +1,31 @@
 import axios from "axios";
 
-const apiBaseURL = "http://localhost:3000"
 
-export const login = (data, config) => {
-    return axios.post(`${apiBaseURL}/auth/log-in`, data, config);
+const instance = axios.create({
+    baseURL: "http://localhost:3000"
+});
+
+instance.interceptors.response.use((response) => response, (error) => {
+    if(error.response.status === 401){
+        //logout api call
+        window.location.href = "/login";
+    }
+});
+
+
+export const login =   (data, config) => {
+    return instance.post(`/auth/log-in`, data, config);
 }
 
-export const signup = async (data, config) => {
-    const res = await axios.post(`${apiBaseURL}/auth/sign-up`, data, config);
-    return res.data;
+export const signup =  (data, config) => {
+    return instance.post(`/auth/sign-up`, data, config);
 }
 
-export const logout = async(data, config) => {
-    const res = await axios.post(`${apiBaseURL}/auth/log-out`, data, config);
-    return res.data; 
+export const logout = (data, config) => {
+    return instance.post(`/auth/log-out`, data, config);
 }
 
 //fix  userid later
-export const getBooks = async(data, config) => {
-    const res = await axios.post(`${apiBaseURL}/1/books`, data, config);
-    return res.data; 
+export const getBooks = (config) => {
+    return instance.get(`/users/1/books`, config);
 }

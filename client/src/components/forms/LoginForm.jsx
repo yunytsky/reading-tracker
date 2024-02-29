@@ -13,10 +13,13 @@ const LoginForm = () => {
           setSubmitError({error: false, message: ""});
         }
 
-        const data = await login(values);
+        const config = {withCredentials: true}
+        const res = await login(values, config);
+
+        localStorage.setItem("user", JSON.stringify(res.data.user));
 
         actions.resetForm();
-        navigate("/");
+        navigate("/library");
 
       } catch (error) {
         if(error.response.data.message){

@@ -42,7 +42,9 @@ export async function login(req, res) {
         }
         const token = issueJWT(user);
 
-        return res.status(200).cookie("token", token, {httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000}).json({ error: false, message: "Successfully authorized"});
+        delete user.password;
+
+        return res.status(200).cookie("token", token, {httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000}).json({ error: false, message: "Successfully authorized", user: user});
     
     } catch (error) {
         return res.status(500).json({ error: true, message: error.message });
