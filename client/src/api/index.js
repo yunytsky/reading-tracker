@@ -29,3 +29,7 @@ export const logout = (data, config) => {
 export const getBooks = (config) => {
     return instance.get(`/users/1/books`, config);
 }
+
+export const getColors = (config) => {
+    return instance.get(`/colors`, config);
+}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import BookEntry from "../components/BookEntry";
-import { getBooks } from "../api";
+import { getBooks, getColors } from "../api";
 import {useLoaderData} from "react-router-dom";
 
 const Library = () => {
@@ -11,8 +11,8 @@ const Library = () => {
         <div className="library">
             <h3>My library</h3>
             <div className="book-entries">
-                {data && data.books && data.books.map((book, index) => (
-                    <BookEntry name={book.name} status={book.status} key={index}/>
+                {data && data.booksData && data.booksData.books.map((book, index) => (
+                    <BookEntry name={book.name} status={book.status} key={index} colors={data.colorsData.colors}/>
                 ))}
             </div>
         </div>
@@ -22,8 +22,11 @@ const Library = () => {
 export const libraryLoader = async () => {
     try {
         const config = {withCredentials: true};
-        const res = await getBooks(config);
-        return res.data;
+
+        const booksRes = await getBooks(config);
+        const colorsRes = await getColors();
+
+        return {booksData: booksRes.data, colorsData: colorsRes.data};
     } catch (error) {
         return error;
     }
