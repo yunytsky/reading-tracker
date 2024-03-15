@@ -6,6 +6,8 @@ const BookEntry = (props) => {
     const [plannedColors, setPlannedColors] = useState({});
     const [noneColors, setNoneColors] = useState({});
 
+    const [finishedReadingYear, setFinishedReadingYear] = useState(null);
+
     useEffect(() => {
         if(props.colors){
             const red = props.colors.find(color => color.name === 'red');
@@ -17,52 +19,66 @@ const BookEntry = (props) => {
             setReadingColors({backgroundColor: `#${red.background}`, color: `#${red.foreground}`});
             setPlannedColors({backgroundColor: `#${blue.background}`, color: `#${blue.foreground}`});
             setNoneColors({backgroundColor: `#${gray.background}`, color: `#${gray.foreground}`});
-
         }
-    }, [])
 
+        if(props.status === "finished" && props.finishedReading) {
+          const date = new Date(props.finishedReading);
+          const year = date.getFullYear();
+          setFinishedReadingYear(year);
+        }
+
+    }, [])
 
     return (
       <div className="book-entry">
-        <div
-          className="book-entry-img"
-          style={
-            props.status === "finished"
-              ? { backgroundColor: finishedColors.backgroundColor }
-              : props.status === "reading"
-              ? { backgroundColor: readingColors.backgroundColor }
-              : props.status === "planned"
-              ? { backgroundColor: plannedColors.backgroundColor }
-              : { backgroundColor: noneColors.backgroundColor }
-          }
-        >
-          <img
-            src={
+        <div className="book-entry-left">
+          <div
+            className="book-entry-img"
+            style={
               props.status === "finished"
-                ? "http://localhost:3000/img/books/finished.svg"
+                ? { backgroundColor: finishedColors.backgroundColor }
                 : props.status === "reading"
-                ? "http://localhost:3000/img/books/reading.svg"
+                ? { backgroundColor: readingColors.backgroundColor }
                 : props.status === "planned"
-                ? "http://localhost:3000/img/books/planned.svg"
-                : "http://localhost:3000/img/books/none.svg"
+                ? { backgroundColor: plannedColors.backgroundColor }
+                : { backgroundColor: noneColors.backgroundColor }
             }
-            alt=""
-          />
+          >
+            <img
+              src={
+                props.status === "finished"
+                  ? "http://localhost:3000/img/books/finished.svg"
+                  : props.status === "reading"
+                  ? "http://localhost:3000/img/books/reading.svg"
+                  : props.status === "planned"
+                  ? "http://localhost:3000/img/books/planned.svg"
+                  : "http://localhost:3000/img/books/none.svg"
+              }
+              alt=""
+            />
+          </div>
+          <h6 className="book-entry-name">{props.name}</h6>
         </div>
-        <h5 className="book-entry-name">{props.name}</h5>
-        <div
-          className="book-entry-status status"
-          style={
-            props.status === "finished"
-              ? finishedColors
-              : props.status === "reading"
-              ? readingColors
-              : props.status === "planned"
-              ? plannedColors
-              : noneColors
-          }
-        >
-          {props.status}
+        <div className="book-entry-right">
+          {finishedReadingYear && (
+            <div className="book-entry-year">
+              {finishedReadingYear}
+            </div>
+          )}
+          <div
+            className="book-entry-status status"
+            style={
+              props.status === "finished"
+                ? finishedColors
+                : props.status === "reading"
+                ? readingColors
+                : props.status === "planned"
+                ? plannedColors
+                : noneColors
+            }
+          >
+            {props.status}
+          </div>
         </div>
       </div>
     );

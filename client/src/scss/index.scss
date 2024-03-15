@@ -13,11 +13,22 @@ html {
 }
 body {
   color: $black;
+  overflow-x: hidden;
 }
 .App {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+#overlay{
+  background-color: black;
+  opacity: .5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 .logo{
@@ -73,13 +84,48 @@ body {
   }
 }
 
-.library{
+.library, .book{
+  max-width: 1680px;
+  width: 100%;
+  margin: 0 auto;
   padding: 2em 4em;
   h3{
     margin-bottom: 1em;
   }
 }
 
+
+.library-toolbar{
+  padding: 12px 0;
+  border-top: 1px solid $black-10;
+  border-bottom: 1px solid $black-10;
+  display: flex;
+  justify-content: space-between;
+  .button{
+    @include button-3;
+    padding: 6px 16px;
+  }
+}
+
+.filters{
+  display: flex;
+}
+
+.status-filter{
+  margin-right: 1em;
+}
+
+.status-filter, .finished-reading-filter{
+  @include button-3;
+  border: 1px solid $black-10;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+
+  color: $black-50;
+
+}
 
 //--------------------
 @import "forms";

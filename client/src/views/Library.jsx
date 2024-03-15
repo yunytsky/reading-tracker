@@ -2,20 +2,34 @@ import { useEffect, useState } from "react";
 import BookEntry from "../components/BookEntry";
 import { getBooks, getColors } from "../api";
 import {useLoaderData} from "react-router-dom";
+import LibraryToolbar from "../components/LibraryToolbar";
 
 const Library = () => {
     const data = useLoaderData();
 
+    return (
+      <div className="library">
+        <h3>My library</h3>
 
-    return(
-        <div className="library">
-            <h3>My library</h3>
-            <div className="book-entries">
-                {data && data.booksData && data.booksData.books.map((book, index) => (
-                    <BookEntry name={book.name} status={book.status} key={index} colors={data.colorsData.colors}/>
-                ))}
-            </div>
+        <LibraryToolbar />
+
+        <div className="book-entries">
+          {data &&
+            data.booksData &&
+            data.booksData.books
+              .slice()
+              .reverse()
+              .map((book, index) => (
+                <BookEntry
+                  name={book.name}
+                  status={book.status}
+                  finishedReading={book.finishedReading}
+                  key={index}
+                  colors={data.colorsData.colors}
+                />
+              ))}
         </div>
+      </div>
     );
 };
 

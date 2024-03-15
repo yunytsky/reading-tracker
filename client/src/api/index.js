@@ -21,15 +21,24 @@ export const signup =  (data, config) => {
     return instance.post(`/auth/sign-up`, data, config);
 }
 
-export const logout = (data, config) => {
-    return instance.post(`/auth/log-out`, data, config);
+export const logout = (config) => {
+    return instance.post(`/auth/log-out`, config);
 }
 
 //fix  userid later
 export const getBooks = (config) => {
     return instance.get(`/users/1/books`, config);
 }
+//fix  userid later
+export const getBook = (config, bookId) => {
+    return instance.get(`/users/1/books/${bookId}`, config);
+}
 
 export const getColors = (config) => {
     return instance.get(`/colors`, config);
+}
+
+//fix  userid later
+export const addBook = (data, config) => {
+    return instance.post(`/users/1/books`, data, config);
 }

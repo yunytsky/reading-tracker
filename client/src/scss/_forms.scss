@@ -58,3 +58,33 @@
     text-align: center;
     margin: -.5em 0 .5em 0;
 }
+
+.add-book-form{
+    display: flex;
+    flex-direction: column;
+    background-color: $white;
+    position: absolute;
+    border-radius: 4px;
+    padding: 2em 1em;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    border: 1px solid $black-10;
+    
+    .button{
+        margin: 0 auto;
+        padding: 6px 24px;
+    }
+}
+
+.add-book-form-input{
+    padding: 1em .65em;
+    margin-bottom: 2em;
+}
+
+.add-book-form-label{
+    text-align: center;
+    color: $black-75;
+    margin-bottom: 1em;
+}

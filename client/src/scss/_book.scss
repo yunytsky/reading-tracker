@@ -1,23 +1,132 @@
+//Book entry
+.book-entries{
+    display: flex;
+    flex-direction: column;
+}
+
+.book-entry-left, .book-entry-right{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .book-entry{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 8px;
     cursor: pointer;
-    border: 1px solid $black-10;
-    border-radius: 8px;
-    box-shadow: $shadow-main;
-    padding: 1em;
+    border-bottom: 1px solid $black-10;
+
+    &:hover{
+        background-color: $black-5-50;
+    }
+
+    &:active{
+        background-color: $black-5-75;
+
+    }
 }
 
-.book-entry-author{
+
+.book-entry-img{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    margin-right: 1em;
+    img{
+        width: 16px;
+    }
+}
+
+.book-entry-name{
+    font-weight: 600;
+    color: $black-75
+}
+
+.book-entry-year{
+    margin-right: 16px;
+    @include body-2;
+    color: $black-75;
+}
+
+.book-entry-status, .book-status{
     @include body-3;
+    @include medium;
+    border-radius: 100px;
+    padding: 4px 12px;
+    text-align: center;
+    text-transform: capitalize;
 }
 
-.book-entry-status{
-    @include body-4;
-    @include medium;
-    color: $black-50;
-    background-color: $black-5;
+//Book page
+.book-properties{
+    margin-bottom: 3em;
+}
+
+.book-property{
+    @include body-1;
+    color: $black-75;
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.book-property.summary{
+    display: block;
+}
+
+.book-status{
+    @include body-2;
+    font-weight: normal;
+}
+
+.book-author:first-of-type, .book-status:first-of-type, .book-finished-reading, .book-score{
+    margin-left: 8px;
+}
+.book-author, .book-status, .book-name, .book-score, .book-summary, .book-finished-reading{
+    cursor: pointer;
+}
+
+.book-author{
+    @include body-2;
     border-radius: 100px;
-    padding: .5em;
+    padding: 4px 12px;
     text-align: center;
-    max-width: 8em;
     text-transform: capitalize;
+    margin-right: 4px;
+    &:last-of-type{
+        margin-right: 0;
+    }
+}
+
+.book-finished-reading{
+
+}
+
+.book-score{
+    @include body-1;
+    color: $black;
+    display: flex;
+    align-items: center;
+    img{
+        margin-left: 4px;
+    }
+}
+
+.book-summary{
+    @include body-1;
+    color: $black;
+}
+
+.book-delete-button{
+    @include button-2;
+    color: $red;
+    border: 1px solid $red;
+    border-radius: 100px;
+    padding: 8px 32px;
 }
