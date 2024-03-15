@@ -3,12 +3,15 @@ import BookEntry from "../components/BookEntry";
 import { getBooks, getColors } from "../api";
 import {useLoaderData} from "react-router-dom";
 import LibraryToolbar from "../components/LibraryToolbar";
+import Breadcrumbs from "../components/Breadcrumbs";
 
 const Library = () => {
     const data = useLoaderData();
 
     return (
       <div className="library">
+        <Breadcrumbs/>
+
         <h3>My library</h3>
 
         <LibraryToolbar />

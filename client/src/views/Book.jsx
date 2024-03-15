@@ -2,6 +2,7 @@ import { useLoaderData } from "react-router-dom";
 import { getBook, getColors } from "../api";
 import { useEffect, useState } from "react";
 import starIcon from "../assets/star.svg"
+import Breadcrumbs from "../components/Breadcrumbs";
 
 const Book = () => {
     const {bookData, colorsData} = useLoaderData();
@@ -35,6 +36,8 @@ const Book = () => {
 
     return (
       <div className="book">
+        <Breadcrumbs/>
+
         {bookData && bookData.book && bookData.bookAuthors && (
           <>
             <h3 className="book-name">{bookData.book.name}</h3>

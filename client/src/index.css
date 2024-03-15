@@ -199,6 +199,14 @@ body {
   height: 100vh;
 }
 
+.breadcrumbs {
+  font-size: 0.875rem;
+  line-height: 1.2;
+  color: #40404A;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+}
+
 .logo {
   display: flex;
   align-items: center;
