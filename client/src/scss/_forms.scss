@@ -88,3 +88,154 @@
     color: $black-75;
     margin-bottom: 1em;
 }
+
+.book-property-form{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: $white;
+    border: 1px solid $black-10;
+    z-index: 999;
+    border-radius: 8px;
+    box-shadow: $shadow-main;
+    width: 50vw;
+    max-width: 45em;
+    padding: 2em;
+}
+
+.authors-form{
+    h5{
+        text-align: center;
+        margin-bottom: .5em;
+        padding-bottom: 1em;
+        border-bottom: 1px solid $black-10;
+    }
+    h6{
+        color: $black-50;
+        margin-bottom: .5em;
+    }
+}
+
+.authors-form-chosen-list{
+    display: flex;
+    align-items: center;
+    margin-bottom: .5em;
+    padding-bottom: .5em;
+    border-bottom: 1px solid $black-10;
+}
+
+.authors-form-author-chosen {
+    cursor: pointer;
+    position: relative;
+    &:hover{
+        filter: brightness(94%) saturate(110%);
+        padding-right: 2em;
+        &::before{
+            @include body-2;
+            content: "⨯";
+            position: absolute;
+            top: 0;
+            right: .5em; 
+        }
+    }
+}
+
+.authors-form-author{
+}
+
+.authors-form-list{
+    margin-bottom: 1em;
+    padding-bottom: .5em;
+    border-bottom: 1px solid $black-10;
+    max-height: 10em;
+    overflow-y: auto;
+    @include scrollbar;
+}
+
+.authors-form-list-element{
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .25em;
+    &:hover{
+        background-color: $black-5-75;
+        .authors-form-author-rename-input{
+            background-color: $black-5-75;
+        }
+    }
+}
+
+.authors-form-list-element-left, .authors-form-list-element-right{
+    display: flex;
+    align-items: center;
+}
+
+.authors-form-author-change-color-button, .authors-form-author-rename-button, .authors-form-author-delete-button{
+    filter:$black-50-svg;
+    width: 14px;
+    height: 14px;
+    &:hover, &:focus, &:active{
+        filter: $black-75-svg;
+    }
+}
+
+.authors-form-author-rename-button{
+    margin-right: 8px;
+}
+
+.authors-form-author-delete-button{
+    margin-right: 4px;
+}
+
+.authors-form-add-new-button{
+    @include button-2;
+    @include medium;
+    color: $black-50;
+    text-align: left;
+    margin-bottom: 2.5em;
+    b{
+        color: $black-25;
+        @include semibold;
+    }
+    &:hover, &:focus, &:focus{
+        b{
+            color: $black-50;
+        }
+    }
+}
+
+.authors-form-buttons{
+    button{
+        padding: 6px 24px;
+        @include button-2;
+    }
+}
+
+.authors-form-save-button {
+    margin-right: .5em;
+}
+
+.authors-form-add-new{
+    margin-top: -.5em;
+}
+
+.authors-form-add-new-buttons{
+    button{
+        @include button-3;
+        &:hover, &:active{
+            color: $black;
+        }
+    }
+    button:first-child{
+        margin-right: .75em;
+    }
+}
+.authors-form-add-new-input, .authors-form-author-rename-input{
+    @include body-3;
+    border-bottom: 1px solid $black-50;
+}

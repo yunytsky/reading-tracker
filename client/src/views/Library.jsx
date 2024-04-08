@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import BookEntry from "../components/BookEntry";
 import { getBooks, getColors } from "../api";
 import {useLoaderData} from "react-router-dom";
@@ -27,6 +26,7 @@ const Library = () => {
                   name={book.name}
                   status={book.status}
                   finishedReading={book.finishedReading}
+                  bookId={book.bookId}
                   key={index}
                   colors={data.colorsData.colors}
                 />

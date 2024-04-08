@@ -54,18 +54,19 @@
     color: $black-75;
 }
 
-.book-entry-status, .book-status{
+.status{
     @include body-3;
     @include medium;
     border-radius: 100px;
     padding: 4px 12px;
     text-align: center;
     text-transform: capitalize;
+    user-select: none;
 }
 
 //Book page
 .book-properties{
-    margin-bottom: 3em;
+    margin-bottom: 2.5em;
 }
 
 .book-property{
@@ -74,13 +75,16 @@
     display: flex;
     align-items: center;
     margin-bottom: 16px;
+    position: relative;
 }
 
 .book-property.summary{
     display: block;
 }
 
-.book-status{
+
+
+.status.big{
     @include body-2;
     font-weight: normal;
 }
@@ -92,23 +96,33 @@
     cursor: pointer;
 }
 
-.book-author{
-    @include body-2;
+.author{
+    @include body-3;
+    @include medium;
     border-radius: 100px;
     padding: 4px 12px;
     text-align: center;
+    user-select: none;
     text-transform: capitalize;
     margin-right: 4px;
+    user-select: none;
     &:last-of-type{
         margin-right: 0;
     }
 }
+
+.author.big{
+    @include body-2;
+    font-weight: normal;
+}
+
 
 .book-finished-reading{
 
 }
 
 .book-score{
+    user-select: none;
     @include body-1;
     color: $black;
     display: flex;
@@ -121,6 +135,24 @@
 .book-summary{
     @include body-1;
     color: $black;
+    cursor: text;
+    border-radius: 4px;
+    display: block;
+    max-width: 75%;
+    &:hover{
+        background-color: $black-5-50;
+    }
+}
+
+.book-summary.editable{
+    margin-top: 8px;
+    padding: 8px 8px 24px 8px;
+    border: 1px solid $black-10;
+    width: 100%;
+
+    &:hover{
+        background-color: transparent;
+    }
 }
 
 .book-delete-button{
@@ -129,4 +161,110 @@
     border: 1px solid $red;
     border-radius: 100px;
     padding: 8px 32px;
+    &:hover, &:focus{
+        color: darken($color: $red, $amount: 20%);
+        border: 1px solid darken($color: $red, $amount: 30%);
+    }
+    &:active{
+        background-color: lighten($color: $red, $amount: 36%);
+    }
+}
+
+.book-property-dropdown{
+    position: absolute;
+    top: 100%;
+    left: 5%;
+    background-color: $white;
+    border: 1px solid $black-10;
+    z-index: 999;
+    border-radius: 8px;
+    box-shadow: $shadow-main;
+}
+
+.authors-form-dropdown{
+    padding: 0.5em 0;
+    min-width: 30%;
+    top: 50%;
+    left: 62%;
+    h6{
+        margin-bottom: .5em;
+        padding: 0 .5em .5em .5em;
+        color: $black-75;
+        border-bottom: 1px solid $black-10;
+    }
+}
+
+.color-dropdown-options{
+    max-height: 12em;
+    overflow-y: auto;
+    @include scrollbar;
+}
+
+.color-dropdown-option{
+    padding: .25em .5em;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    &:hover{
+        background-color: $black-5;
+    }
+}
+
+.color-dropdown-option-color{
+    width: 24px;
+    height: 12px;
+    border-radius: 2px;
+    margin-right: .5em;
+    filter: brightness(150%) saturate(70%);
+}
+
+.color-dropdown-option-name{
+    @include body-3;
+    color: $black-75;
+    text-transform: capitalize;
+}
+
+.status-dropdown-options{
+    max-height: 80%;
+}
+
+.status-dropdown-option, .score-dropdown-option, .finished-reading-dropdown-option{
+    user-select: none;
+    cursor: pointer;
+    @include button-2;
+    text-transform: capitalize;
+    color: $black-75;
+    padding: .85em 3em;
+    text-align: center;
+    &:hover{
+        background-color: $black-5;
+    }
+}
+
+
+.score-dropdown-option, .finished-reading-dropdown-option{
+    padding: .65em 3em;
+
+}
+
+.status-dropdown-option.selected, .score-dropdown-option.selected, .finished-reading-dropdown-option.selected{
+    background-color: $black-5;
+}
+
+.score-dropdown, .finished-reading-dropdown{
+    max-height: 12em;
+    overflow-y: auto;
+    
+   @include scrollbar;
+}
+
+.book-property-empty{
+    @include medium;
+    cursor: pointer;
+    color: $black-75;
+    display: inline;
+    margin-left: 8px;
+    &:hover, &:active{
+        color: $black-50;
+    }
 }

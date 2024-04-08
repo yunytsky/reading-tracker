@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const BookEntry = (props) => {
     const [finishedColors, setFinishedColors] = useState({});
@@ -30,7 +31,7 @@ const BookEntry = (props) => {
     }, [])
 
     return (
-      <div className="book-entry">
+      <Link to={`/library/book/${props.bookId}`} className="book-entry">
         <div className="book-entry-left">
           <div
             className="book-entry-img"
@@ -66,7 +67,7 @@ const BookEntry = (props) => {
             </div>
           )}
           <div
-            className="book-entry-status status"
+            className="book-entry-status status small"
             style={
               props.status === "finished"
                 ? finishedColors
@@ -80,7 +81,7 @@ const BookEntry = (props) => {
             {props.status}
           </div>
         </div>
-      </div>
+      </Link>
     );
 };
 

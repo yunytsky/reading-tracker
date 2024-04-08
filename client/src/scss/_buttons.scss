@@ -6,4 +6,42 @@
     }
 
     border-radius: 4px;
+
+    &:hover, &:focus{
+       background-color: darken($color: $primary, $amount: 3%); 
+    }
+    &:active{
+        background-color: darken($color: $primary, $amount: 5%); 
+    }
+    &:disabled{
+        background-color: $black-10;
+        color: $black-25;
+        a{
+            color: $black-25;
+
+        }
+    }
+}
+
+.button.empty{
+    background-color: $white;
+    color: $black-50;
+    a{
+        color: $black-50;
+    }
+    border: 1px solid $black-25;
+    &:hover, &:focus{
+        border: 1px solid $black-50;
+     }
+    &:active{
+        background-color: $black-5-50;
+    }
+    &:disabled{
+        border: 1px solid $black-10;
+        background-color: $black-10;
+        color: $black-25;
+        a{
+            color: $black-25;
+        }
+    }
 }

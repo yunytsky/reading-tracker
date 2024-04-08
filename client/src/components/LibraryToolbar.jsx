@@ -9,9 +9,6 @@ const LibraryToolbar = () => {
   const addBookFormRef = useRef(null);
   const addBookButtonRef = useRef(null);
 
-  //Close the form on click
-  useEffect(() => {}, []);
-
   const handleAddBook = async (e) => {
     try {
       e.preventDefault();
@@ -21,8 +18,8 @@ const LibraryToolbar = () => {
       const res = await addBook(data, config);
       console.log(res.data.book);
       setAddBookFormVisible(false);
-      //rea.data.book returns an id
-      //navigate to the book page here
+      
+      navigate(`/library/book/${res.data.book}`);
     } catch (error) {}
   };
 
@@ -70,10 +67,10 @@ const LibraryToolbar = () => {
   return (
     <div className="library-toolbar">
       <div className="filters">
-        <div className="status-filter">
+        <div className="status-filter filter">
           Status
         </div>
-        <div className="finished-reading-filter">
+        <div className="finished-reading-filter filter">
           Finished reading
         </div>
       </div>

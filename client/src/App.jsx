@@ -5,6 +5,8 @@ import AppLayout from "./layouts/AppLayout";
 import Library, { libraryLoader } from "./views/Library";
 import ErrorBoundary from "./views/ErrorBoundary";
 import Book, { bookLoader } from "./views/Book";
+import Profile from "./views/Profile";
+import Review from "./views/Review";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -13,6 +15,9 @@ const router = createBrowserRouter(
       <Route path="signup" element={<Signup/>}/>
       <Route path="library" element={<Library/>} loader={libraryLoader}/>
       <Route path="library/book/:bookId" element={<Book/>} loader={bookLoader}/>
+      <Route path="profile" element={<Profile/>} />
+      <Route path="review" element={<Review/>} />
+
     </Route>
   )
 )

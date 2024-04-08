@@ -13,6 +13,7 @@ const LoginForm = () => {
           setSubmitError({error: false, message: ""});
         }
 
+
         const config = {withCredentials: true}
         const res = await login(values, config);
 
@@ -22,9 +23,12 @@ const LoginForm = () => {
         navigate("/library");
 
       } catch (error) {
-        if(error.response.data.message){
+        console.log("ERRPR CATCHED")
+        console.log("E",error)
+        if(error.response && error.response.data.message){
           setSubmitError({error: true, message: error.response.data.message})
         }else{
+          
           setSubmitError({error: true, message: "Error"})
         }
       }
