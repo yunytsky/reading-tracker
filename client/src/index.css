@@ -200,6 +200,10 @@ body {
   height: 100vh;
 }
 
+#overlay.transparent {
+  background-color: transparent;
+}
+
 @keyframes shake {
   0% {
     transform: translateX(0);
@@ -280,18 +284,18 @@ body {
   margin-bottom: 1.5em;
 }
 
-.library, .book, .review {
+.library, .book, .review, .profile {
   max-width: 1680px;
   width: 100%;
   margin: 0 auto;
   padding: 2em 4em;
 }
-.library h3, .book h3, .review h3 {
+.library h3, .book h3, .review h3, .profile h3 {
   margin-bottom: 0.5em;
 }
 
 .book h3 {
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
 }
 
 .library-toolbar, .review-toolbar {
@@ -306,6 +310,10 @@ body {
   font-weight: 500;
   line-height: 1.2;
   padding: 6px 16px;
+}
+
+.review-toolbar {
+  margin-bottom: 1em;
 }
 
 .review-tabs {
@@ -339,6 +347,10 @@ body {
 }
 
 .filter {
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
   font-size: 0.625rem;
   font-weight: 500;
   line-height: 1.2;
@@ -347,15 +359,120 @@ body {
   display: flex;
   align-items: center;
   padding: 8px;
+  position: relative;
+  margin-right: 1em;
+}
+.filter:last-child {
+  margin-right: 0;
+}
+
+.filter-name {
+  margin-right: 0.75em;
   color: #808086;
 }
 
+.filter-selected {
+  display: flex;
+  align-items: center;
+}
+
+.filter-arrow {
+  filter: brightness(0%) invert(55%) sepia(6%) saturate(277%) hue-rotate(202deg) brightness(90%) contrast(88%);
+  height: 8px;
+  width: 8px;
+}
+
+.filter-selected-name {
+  margin-right: 0.35em;
+  color: #007BD0;
+}
+
+.filter-selected-name.all {
+  color: #01000D;
+}
+
 .chart.doughnut-chart {
-  max-width: 360px;
+  max-width: 380px;
 }
 
 .chart.bar-chart {
-  max-width: 40%;
+  max-width: 520px;
+}
+
+.delete-button {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #F9455A;
+  border: 1px solid #F9455A;
+  border-radius: 100px;
+  padding: 8px 32px;
+}
+.delete-button:hover, .delete-button:focus {
+  color: #d1071e;
+  border: 1px solid #a00517;
+}
+.delete-button:active {
+  background-color: #fff7f8;
+}
+
+.filter-dropdown {
+  min-width: 20em;
+  max-width: 100%;
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #E6E6E7;
+  z-index: 999;
+  border-radius: 8px;
+  box-shadow: rgba(33, 35, 38, 0.1) 0px 10px 10px -10px;
+  padding: 0.75em 0;
+  top: 100%;
+  left: 0;
+}
+
+.filter-dropdown-options {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5em;
+}
+
+.filter-dropdown-option {
+  display: flex;
+  align-items: center;
+  padding: 0.35em 0.5em;
+  cursor: pointer;
+}
+.filter-dropdown-option:hover {
+  background-color: #F2F2F3;
+}
+
+.filter-dropdown-option {
+  text-transform: capitalize;
+}
+.filter-dropdown-option input {
+  margin-right: 0.25em;
+}
+
+.filter-dropdown-actions {
+  display: flex;
+  text-align: center;
+  padding: 0.25em 0.5em;
+}
+
+.filter-dropdown-action-button {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #808086;
+  margin-right: 0.75em;
+}
+.filter-dropdown-action-button:last-child {
+  margin-right: 0;
+}
+.filter-dropdown-action-button:hover, .filter-dropdown-action-button:active {
+  color: #40404A;
 }
 
 .login-form, .signup-form {
@@ -448,6 +565,21 @@ body {
   margin-bottom: 2em;
 }
 
+.add-book-form-input.error {
+  animation: shake 0.5s;
+  border: 1px solid #F9455A;
+}
+
+.add-book-form-error {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #F9455A;
+  text-align: center;
+  margin-top: -2em;
+  margin-bottom: 2em;
+}
+
 .add-book-form-label {
   text-align: center;
   color: #40404A;
@@ -472,18 +604,18 @@ body {
   padding: 2em;
 }
 
-.authors-form h5 {
+.authors-form h5, .genres-form h5 {
   text-align: center;
   margin-bottom: 0.5em;
   padding-bottom: 1em;
   border-bottom: 1px solid #E6E6E7;
 }
-.authors-form h6 {
+.authors-form h6, .genres-form h6 {
   color: #808086;
   margin-bottom: 0.5em;
 }
 
-.authors-form-chosen-list {
+.authors-form-chosen-list, .genres-form-chosen-list {
   display: flex;
   align-items: center;
   margin-bottom: 0.5em;
@@ -491,15 +623,15 @@ body {
   border-bottom: 1px solid #E6E6E7;
 }
 
-.authors-form-author-chosen {
+.authors-form-author-chosen, .genres-form-genre-chosen {
   cursor: pointer;
   position: relative;
 }
-.authors-form-author-chosen:hover {
+.authors-form-author-chosen:hover, .genres-form-genre-chosen:hover {
   filter: brightness(94%) saturate(110%);
   padding-right: 2em;
 }
-.authors-form-author-chosen:hover::before {
+.authors-form-author-chosen:hover::before, .genres-form-genre-chosen:hover::before {
   font-size: 0.875rem;
   line-height: 1.5;
   content: "⨯";
@@ -508,7 +640,7 @@ body {
   right: 0.5em;
 }
 
-.authors-form-list {
+.authors-form-list, .genres-form-list {
   margin-bottom: 1em;
   padding-bottom: 0.5em;
   border-bottom: 1px solid #E6E6E7;
@@ -517,53 +649,57 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #BFBFC3 #F2F2F3;
 }
-.authors-form-list::-webkit-scrollbar {
+.authors-form-list::-webkit-scrollbar, .genres-form-list::-webkit-scrollbar {
   width: 4px;
 }
-.authors-form-list::-webkit-scrollbar-track {
+.authors-form-list::-webkit-scrollbar-track, .genres-form-list::-webkit-scrollbar-track {
   background-color: #F2F2F3;
 }
-.authors-form-list::-webkit-scrollbar-thumb {
+.authors-form-list::-webkit-scrollbar-thumb, .genres-form-list::-webkit-scrollbar-thumb {
   background-color: #BFBFC3;
 }
 
-.authors-form-list-element {
+.authors-form-list-element, .genres-form-list-element {
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.25em;
 }
-.authors-form-list-element:hover {
+.authors-form-list-element:hover, .genres-form-list-element:hover {
   background-color: rgba(242, 242, 243, 0.75);
 }
-.authors-form-list-element:hover .authors-form-author-rename-input {
+.authors-form-list-element:hover .authors-form-author-rename-input, .authors-form-list-element:hover .genres-form-genre-rename-input, .genres-form-list-element:hover .authors-form-author-rename-input, .genres-form-list-element:hover .genres-form-genre-rename-input {
   background-color: rgba(242, 242, 243, 0.75);
 }
 
-.authors-form-list-element-left, .authors-form-list-element-right {
+.authors-form-list-element-left, .authors-form-list-element-right, .genres-form-list-element-left, .genres-form-list-element-right {
   display: flex;
   align-items: center;
 }
 
-.authors-form-author-change-color-button, .authors-form-author-rename-button, .authors-form-author-delete-button {
+.authors-form-author-change-color-button, .authors-form-author-rename-button, .authors-form-author-delete-button,
+.genres-form-genre-change-color-button, .genres-form-genre-rename-button, .genres-form-genre-delete-button {
   filter: brightness(0%) invert(55%) sepia(6%) saturate(277%) hue-rotate(202deg) brightness(90%) contrast(88%);
   width: 14px;
   height: 14px;
 }
-.authors-form-author-change-color-button:hover, .authors-form-author-change-color-button:focus, .authors-form-author-change-color-button:active, .authors-form-author-rename-button:hover, .authors-form-author-rename-button:focus, .authors-form-author-rename-button:active, .authors-form-author-delete-button:hover, .authors-form-author-delete-button:focus, .authors-form-author-delete-button:active {
+.authors-form-author-change-color-button:hover, .authors-form-author-change-color-button:focus, .authors-form-author-change-color-button:active, .authors-form-author-rename-button:hover, .authors-form-author-rename-button:focus, .authors-form-author-rename-button:active, .authors-form-author-delete-button:hover, .authors-form-author-delete-button:focus, .authors-form-author-delete-button:active,
+.genres-form-genre-change-color-button:hover,
+.genres-form-genre-change-color-button:focus,
+.genres-form-genre-change-color-button:active, .genres-form-genre-rename-button:hover, .genres-form-genre-rename-button:focus, .genres-form-genre-rename-button:active, .genres-form-genre-delete-button:hover, .genres-form-genre-delete-button:focus, .genres-form-genre-delete-button:active {
   filter: brightness(0%) invert(25%) sepia(7%) saturate(861%) hue-rotate(202deg) brightness(87%) contrast(89%);
 }
 
-.authors-form-author-rename-button {
+.authors-form-author-rename-button, .genres-form-genre-rename-button {
   margin-right: 8px;
 }
 
-.authors-form-author-delete-button {
+.authors-form-author-delete-button, .genres-form-genre-delete-button {
   margin-right: 4px;
 }
 
-.authors-form-add-new-button {
+.authors-form-add-new-button, .genres-form-add-new-button {
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.2;
@@ -572,42 +708,42 @@ body {
   text-align: left;
   margin-bottom: 2.5em;
 }
-.authors-form-add-new-button b {
+.authors-form-add-new-button b, .genres-form-add-new-button b {
   color: #BFBFC3;
   font-weight: 600;
 }
-.authors-form-add-new-button:hover b, .authors-form-add-new-button:focus b, .authors-form-add-new-button:focus b {
+.authors-form-add-new-button:hover b, .authors-form-add-new-button:focus b, .authors-form-add-new-button:focus b, .genres-form-add-new-button:hover b, .genres-form-add-new-button:focus b, .genres-form-add-new-button:focus b {
   color: #808086;
 }
 
-.authors-form-buttons button {
+.authors-form-buttons button, .genres-form-buttons button {
   padding: 6px 24px;
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.2;
 }
 
-.authors-form-save-button {
+.authors-form-save-button, .genres-form-save-button {
   margin-right: 0.5em;
 }
 
-.authors-form-add-new {
+.authors-form-add-new.editable, .genres-form-add-new.editable {
   margin-top: -0.5em;
 }
 
-.authors-form-add-new-buttons button {
+.authors-form-add-new-buttons button, .genres-form-add-new-buttons button {
   font-size: 0.625rem;
   font-weight: 500;
   line-height: 1.2;
 }
-.authors-form-add-new-buttons button:hover, .authors-form-add-new-buttons button:active {
+.authors-form-add-new-buttons button:hover, .authors-form-add-new-buttons button:active, .genres-form-add-new-buttons button:hover, .genres-form-add-new-buttons button:active {
   color: #01000D;
 }
-.authors-form-add-new-buttons button:first-child {
+.authors-form-add-new-buttons button:first-child, .genres-form-add-new-buttons button:first-child {
   margin-right: 0.75em;
 }
 
-.authors-form-add-new-input, .authors-form-author-rename-input {
+.authors-form-add-new-input, .authors-form-author-rename-input, .genres-form-add-new-input, .genres-form-genre-rename-input {
   font-size: 0.75rem;
   line-height: 1.5;
   border-bottom: 1px solid #808086;
@@ -747,15 +883,15 @@ body {
   font-weight: normal;
 }
 
-.book-author:first-of-type, .book-status:first-of-type, .book-finished-reading, .book-score {
+.book-author:first-of-type, .book-status:first-of-type, .book-finished-reading, .book-score, .book-genre:first-of-type {
   margin-left: 8px;
 }
 
-.book-author, .book-status, .book-name, .book-score, .book-summary, .book-finished-reading {
+.book-author, .book-status, .book-name, .book-score, .book-summary, .book-finished-reading, .book-genre {
   cursor: pointer;
 }
 
-.author {
+.author, .genre {
   font-size: 0.75rem;
   line-height: 1.5;
   font-weight: 500;
@@ -769,11 +905,11 @@ body {
   margin-right: 4px;
   user-select: none;
 }
-.author:last-of-type {
+.author:last-of-type, .genre:last-of-type {
   margin-right: 0;
 }
 
-.author.big {
+.author.big, .genre.big {
   font-size: 0.875rem;
   line-height: 1.5;
   font-weight: normal;
@@ -816,23 +952,6 @@ body {
   background-color: transparent;
 }
 
-.book-delete-button {
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.2;
-  color: #F9455A;
-  border: 1px solid #F9455A;
-  border-radius: 100px;
-  padding: 8px 32px;
-}
-.book-delete-button:hover, .book-delete-button:focus {
-  color: #d1071e;
-  border: 1px solid #a00517;
-}
-.book-delete-button:active {
-  background-color: #fff7f8;
-}
-
 .book-property-dropdown {
   position: absolute;
   top: 100%;
@@ -844,13 +963,13 @@ body {
   box-shadow: rgba(33, 35, 38, 0.1) 0px 10px 10px -10px;
 }
 
-.authors-form-dropdown {
+.authors-form-dropdown, .genres-form-dropdown {
   padding: 0.5em 0;
   min-width: 30%;
   top: 50%;
   left: 62%;
 }
-.authors-form-dropdown h6 {
+.authors-form-dropdown h6, .genres-form-dropdown h6 {
   margin-bottom: 0.5em;
   padding: 0 0.5em 0.5em 0.5em;
   color: #40404A;
@@ -923,7 +1042,7 @@ body {
   padding: 0.65em 3em;
 }
 
-.status-dropdown-option.selected, .score-dropdown-option.selected, .finished-reading-dropdown-option.selected {
+.status-dropdown-option.selected, .score-dropdown-option.selected, .finished-reading-dropdown-option.selected, .color-dropdown-option.selected {
   background-color: #F2F2F3;
 }
 

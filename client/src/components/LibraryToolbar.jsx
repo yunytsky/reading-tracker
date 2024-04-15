@@ -1,60 +1,106 @@
 import { useEffect, useRef, useState } from "react";
 import { addBook } from "../api";
 import { useNavigate } from "react-router-dom";
+import arrowIcon from "../assets/arrow.svg";
+const LibraryToolbar = ({
+  allYears,
+  allStatuses,
+  selectedYears,
+  selectedStatuses,
+  setSelectedYears,
+  setSelectedStatuses,
+}) => {
+  const navigate = useNavigate();
 
-const LibraryToolbar = () => {
   const [addBookFormVisible, setAddBookFormVisible] = useState(false);
   const [bookName, setBookName] = useState("");
-  const navigate = useNavigate();
+  const [bookNameError, setBookNameError] = useState(false);
   const addBookFormRef = useRef(null);
   const addBookButtonRef = useRef(null);
+
+  const [yearFilterDropdownVisible, setYearFilterDropdownVisible] =
+    useState(false);
+  const yearFilterDropdownButtonRef = useRef(null);
+  const yearFilterDropdownRef = useRef(null);
+
+  const [statusFilterDropdownVisible, setstatusFilterDropdownVisible] =
+    useState(false);
+  const statusFilterDropdownButtonRef = useRef(null);
+  const statusFilterDropdownRef = useRef(null);
 
   const handleAddBook = async (e) => {
     try {
       e.preventDefault();
+
+      if(setBookNameError){
+        setBookNameError(false);
+      }
+
+      if(bookName === ""){
+        setBookNameError(true);
+        return;
+      }
+      
       const config = { withCredentials: true };
       const data = { name: bookName };
 
       const res = await addBook(data, config);
-      console.log(res.data.book);
       setAddBookFormVisible(false);
-      
+
       navigate(`/library/book/${res.data.book}`);
     } catch (error) {}
   };
 
-  //Restrict screen height when form is visible
+  //Restrict screen height when overlay is visible
   useEffect(() => {
-    // Function to handle body styles when the add book form is visible
     const handleBodyStyles = () => {
       if (addBookFormVisible) {
         document.body.style.height = "100vh";
         document.body.style.overflow = "hidden";
+      } else if (yearFilterDropdownVisible) {
+        document.body.style.overflowX = "hidden";
       } else {
         document.body.style.height = "auto";
         document.body.style.overflow = "visible";
       }
     };
 
-    handleBodyStyles(); // Call it initially
-
+    handleBodyStyles();
     return () => {
       // Clean up
       document.body.style.height = "auto";
       document.body.style.overflow = "visible";
     };
-  }, [addBookFormVisible]);
+  }, [addBookFormVisible, yearFilterDropdownVisible]);
 
-  //Hide popup form when clicked elsewhere
+  //Hide popup-form/dropdown-menu when clicked elsewhere
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        addBookFormRef.current != null &&
+        addBookFormRef.current !== null &&
         !addBookFormRef.current.contains(event.target) &&
-        addBookButtonRef !== null &&
+        addBookButtonRef.current !== null &&
         !addBookButtonRef.current.contains(event.target)
       ) {
         setAddBookFormVisible(false);
+        setBookNameError(false);
+      }
+
+      if (
+        yearFilterDropdownRef.current !== null &&
+        !yearFilterDropdownRef.current.contains(event.target) &&
+        yearFilterDropdownButtonRef.current !== null &&
+        !yearFilterDropdownButtonRef.current.contains(event.target)
+      ) {
+        setYearFilterDropdownVisible(false);
+      }
+      if (
+        statusFilterDropdownRef.current !== null &&
+        !statusFilterDropdownRef.current.contains(event.target) &&
+        statusFilterDropdownButtonRef.current !== null &&
+        !statusFilterDropdownButtonRef.current.contains(event.target)
+      ) {
+        setstatusFilterDropdownVisible(false);
       }
     };
 
@@ -67,11 +113,191 @@ const LibraryToolbar = () => {
   return (
     <div className="library-toolbar">
       <div className="filters">
-        <div className="status-filter filter">
-          Status
+        {/* Finished reading filter */}
+        <div
+          className="finished-reading-filter filter"
+          ref={yearFilterDropdownButtonRef}
+          onClick={() => {
+            setYearFilterDropdownVisible((prevVisible) => !prevVisible);
+          }}
+        >
+          <div className="filter-name">Finished reading</div>{" "}
+          <div className="filter-selected">
+            <span
+              className={
+                selectedYears.length === allYears.length
+                  ? "filter-selected-name all"
+                  : "filter-selected-name"
+              }
+            >
+              {selectedYears.length === allYears.length
+                ? "All"
+                : selectedYears.length}
+            </span>
+            <img className="filter-arrow" src={arrowIcon} />
+          </div>
+          {yearFilterDropdownVisible && (
+            <div
+              ref={yearFilterDropdownRef}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className="filter-dropdown"
+            >
+              <div className="filter-dropdown-options">
+                {allYears &&
+                  allYears
+                    .map((year, index) => (
+                      <label
+                        key={index}
+                        className="filter-dropdown-option finished-reading-filter-dropdown-option"
+                      >
+                        <input
+                          type="checkbox"
+                          value={year}
+                          name="finished-reading-year"
+                          checked={selectedYears.some(
+                            (selectedYear) => selectedYear === year
+                          )}
+                          onChange={() => {
+                            if (
+                              selectedYears.some(
+                                (selectedYear) => selectedYear === year
+                              )
+                            ) {
+                              setSelectedYears((prevSelectedYears) => {
+                                return prevSelectedYears.filter(
+                                  (prevSelectedYear) =>
+                                    prevSelectedYear !== year
+                                );
+                              });
+                            } else {
+                              setSelectedYears((prevSelectedYears) => [
+                                ...prevSelectedYears,
+                                year,
+                              ]);
+                            }
+                          }}
+                        />
+                        {year}
+                      </label>
+                    ))
+                    .reverse()}
+              </div>
+
+              <div className="filter-dropdown-actions">
+                <button
+                  className="filter-dropdown-action-button"
+                  onClick={() => {
+                    setSelectedYears(allYears);
+                  }}
+                >
+                  Select all
+                </button>
+                <button
+                  className="filter-dropdown-action-button"
+                  onClick={() => {
+                    setSelectedYears([]);
+                  }}
+                >
+                  Deselect all
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="finished-reading-filter filter">
-          Finished reading
+
+        {/* Status filter */}
+        <div
+          className="status-filter filter"
+          ref={statusFilterDropdownButtonRef}
+          onClick={() => {
+            setstatusFilterDropdownVisible((prevVisible) => !prevVisible);
+          }}
+        >
+          <div className="filter-name">Status</div>{" "}
+          <div className="filter-selected">
+            <span
+              className={
+                selectedStatuses.length === allStatuses.length
+                  ? "filter-selected-name all"
+                  : "filter-selected-name"
+              }
+            >
+              {" "}
+              {selectedStatuses.length === allStatuses.length
+                ? "All"
+                : selectedStatuses.length}
+            </span>
+            <img className="filter-arrow" src={arrowIcon} />
+          </div>
+          {statusFilterDropdownVisible && (
+            <div
+              ref={statusFilterDropdownRef}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className="filter-dropdown"
+            >
+              <div className="filter-dropdown-options">
+                {allStatuses &&
+                  allStatuses.map((status, index) => (
+                    <label
+                      key={index}
+                      className="filter-dropdown-option status-filter-dropdown-option"
+                    >
+                      <input
+                        type="checkbox"
+                        value={status}
+                        name="finished-reading-year"
+                        checked={selectedStatuses.some(
+                          (selectedStatus) => selectedStatus === status
+                        )}
+                        onChange={() => {
+                          if (
+                            selectedStatuses.some(
+                              (selectedStatus) => selectedStatus === status
+                            )
+                          ) {
+                            setSelectedStatuses((prevSelectedStatuses) => {
+                              return prevSelectedStatuses.filter(
+                                (prevSelectedStatus) =>
+                                  prevSelectedStatus !== status
+                              );
+                            });
+                          } else {
+                            setSelectedStatuses((prevSelectedStatuses) => [
+                              ...prevSelectedStatuses,
+                              status,
+                            ]);
+                          }
+                        }}
+                      />
+                      {status}
+                    </label>
+                  ))}
+              </div>
+
+              <div className="filter-dropdown-actions">
+                <button
+                  className="filter-dropdown-action-button"
+                  onClick={() => {
+                    setSelectedStatuses(allStatuses);
+                  }}
+                >
+                  Select all
+                </button>
+                <button
+                  className="filter-dropdown-action-button"
+                  onClick={() => {
+                    setSelectedStatuses([]);
+                  }}
+                >
+                  Deselect all
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="buttons">
@@ -80,6 +306,7 @@ const LibraryToolbar = () => {
           ref={addBookButtonRef}
           onClick={() => {
             setAddBookFormVisible((prevVisible) => !prevVisible);
+            setBookNameError(false);
           }}
         >
           Add +
@@ -94,8 +321,9 @@ const LibraryToolbar = () => {
         <label className="add-book-form-label form-label" htmlFor="book-name">
           <h5>Enter a book name:</h5>
         </label>
-        <textarea
-          className="add-book-form-input form-input"
+
+        <textarea 
+          className={bookNameError ? "add-book-form-input form-input error" : "add-book-form-input form-input"}
           type="text"
           id="book-name"
           name="book-name"
@@ -103,7 +331,9 @@ const LibraryToolbar = () => {
           onChange={(e) => {
             setBookName(e.target.value);
           }}
-        />
+          required></textarea>
+
+        {bookNameError && <div className="add-book-form-error">Enter a book name</div>}
 
         <button
           type="submit"
@@ -118,7 +348,12 @@ const LibraryToolbar = () => {
 
       <div
         id="overlay"
-        style={addBookFormVisible ? { display: "block" } : { display: "none" }}
+        className={yearFilterDropdownVisible ? "transparent" : null}
+        style={
+          addBookFormVisible || yearFilterDropdownVisible
+            ? { display: "block" }
+            : { display: "none" }
+        }
       ></div>
     </div>
   );

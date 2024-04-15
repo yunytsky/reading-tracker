@@ -1,5 +1,5 @@
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
-import { createAuthor, deleteAuthor, deleteBook, editAuthor, editBook, editBookAuthors, getBook, getColors, getUserAuthors } from "../api";
+import { createAuthor, createGenre, deleteAuthor, deleteBook, deleteGenre, editAuthor, editBook, editBookAuthors, editBookGenres, editGenre, getBook, getColors, getUserAuthors, getUserGenres } from "../api";
 import { useEffect, useRef, useState } from "react";
 import Breadcrumbs from "../components/Breadcrumbs";
 
@@ -60,33 +60,46 @@ const Book = () => {
   //-------------------------------------------------
 
   //-------------------------------------------------
+  //Genres form related states and refs
+  const [genresFormVisible, setGenresFormVisible] = useState(false);
+  const genresFormRef = useRef(null);
+  const genresFormChosenRef = useRef(null);
+  const [userGenres, setUserGenres] = useState(null);
+  const [finalBookGenres, setFinalBookGenres] = useState(null);
+  const [addNewGenreInputVisible, setAddNewGenreInputVisible] = useState(false);
+  const [genreNameEditable, setGenreNameEditable] = useState({});
+  const [genreName, setGenreName] = useState("");
+  const [newGenreName,setNewGenreName] = useState("");
+  const genresFormListRef = useRef(null);
+  //-------------------------------------------------
+
+  //-------------------------------------------------
   //Toggle dropdown/form function
   const toggleDropdownOrForm = (setVisible) => {
     setVisible((prevVisible) => !prevVisible);
   };
 
-
   //Hide dropdown menu/form when clicked elsewhere
   useEffect(() => {
       const handleClickOutside = (event) => {
         if (
-          statusDropdownRef.current != null &&
+          statusDropdownRef.current !== null &&
           !statusDropdownRef.current.contains(event.target) &&
-          statusDropdownButtonRef !== null &&
+          statusDropdownButtonRef.current !== null &&
           !statusDropdownButtonRef.current.contains(event.target)
         ) {
           setStatusDropdownVisible(false);
         } else if (
-          scoreDropdownRef.current != null &&
+          scoreDropdownRef.current !== null &&
           !scoreDropdownRef.current.contains(event.target) &&
-          scoreDropdownButtonRef !== null &&
+          scoreDropdownButtonRef.current !== null &&
           !scoreDropdownButtonRef.current.contains(event.target)
         ) {
           setScoreDropdownVisible(false);
         } else if (
-          finishedReadingDropdownRef.current != null &&
+          finishedReadingDropdownRef.current !== null &&
           !finishedReadingDropdownRef.current.contains(event.target) &&
-          finishedReadingDropdownButtonRef !== null &&
+          finishedReadingDropdownButtonRef.current !== null &&
           !finishedReadingDropdownButtonRef.current.contains(event.target)
         ) {
           setFinishedReadingDropdownVisible(false);
@@ -98,10 +111,18 @@ const Book = () => {
           if (colorDropdownVisible) {
             setColorDropdownVisible(false);
           }
+        }  else if (
+          genresFormRef.current !== null &&
+          !genresFormRef.current.contains(event.target)
+        ) {
+          setGenresFormVisible(false);
+          if (colorDropdownVisible) {
+            setColorDropdownVisible(false);
+          }
         } else if (
-          colorDropdownRef.current != null &&
+          colorDropdownRef.current !== null &&
           !colorDropdownRef.current.contains(event.target) &&
-          authorsFormListRef !== null
+          authorsFormListRef.current !== null
       ) {
           // Close all color dropdowns
           let buttonClicked = false;
@@ -204,6 +225,26 @@ const Book = () => {
     fetchAuthors();
   }, [authorsFormVisible]);
 
+   //Fetch user genres when genres form gets opened and make a copy of a genres array
+   useEffect(() => {
+    if(genresFormVisible && bookData.bookGenres){
+      setFinalBookGenres(bookData.bookGenres);
+    }
+    const fetchGenres = async () => {
+      if (genresFormVisible && !userGenres) {
+        try {
+          const config = { withCredentials: true };
+          const res = await getUserGenres(config);
+          setUserGenres(res.data.genres);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    fetchGenres();
+  }, [genresFormVisible]);
+
+
   //-------------------------------------------------
 
   //-------------------------------------------------
@@ -229,10 +270,17 @@ const Book = () => {
       }
   };
 
-  const handleDeleteBookAuthor = (e, author) => {
+  const handleDeleteBookAuthor = (author) => {
 
     setFinalBookAuthors(prevAuthors => {
       const editedArray = prevAuthors.filter(obj => obj.authorId !== author.authorId);
+      return editedArray; 
+  });
+  };
+
+  const handleDeleteBookGenre = (genre) => {
+    setFinalBookGenres(prevGenres => {
+      const editedArray = prevGenres.filter(obj => obj.genreId !== genre.genreId);
       return editedArray; 
   });
   };
@@ -254,13 +302,33 @@ const Book = () => {
     
   };
 
+  const handleAddBookGenre = (e, genre) => {
+    //Check if there are no more than 3 genres and if this genre is not already added
+    if(finalBookGenres.length === 3 || finalBookGenres.some(existingGenre=>existingGenre.genreId===genre.genreId)){
+      const genreElement = e.currentTarget.querySelector(".genre");
+      if (genreElement) {
+          genreElement.classList.add("shake");
+          setTimeout(() => {
+            genreElement.classList.remove("shake");
+          }, 500);
+      }
+      return;
+    }
+
+    setFinalBookGenres(prev => [...prev, genre]);
+    
+  };
+
   const handleDeleteUserAuthor = async (e, authorId) => {
     e.stopPropagation();
     try {
       const config = { withCredentials: true };
-      await deleteAuthor(config, authorId);
-      const res = await getUserAuthors(config);
-      setUserAuthors(res.data.authors);
+      const res = await deleteAuthor(config, authorId);
+      if(!res){
+        throw new error;
+      }
+      const resAuthors = await getUserAuthors(config);
+      setUserAuthors(resAuthors.data.authors);
       const updatedBookAuthors = bookData.bookAuthors.filter(author => author.authorId !== authorId);
       bookData.bookAuthors = updatedBookAuthors;
       const updatedFinalBookAuthors = finalBookAuthors.filter(author => author.authorId !== authorId);
@@ -269,7 +337,26 @@ const Book = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
+
+  const handleDeleteUserGenre = async (e, genreId) => {
+    e.stopPropagation();
+    try {
+      const config = { withCredentials: true };
+      const res = await deleteGenre(config, genreId);
+      if(!res){
+        throw new error;
+      }
+      const resGenres = await getUserGenres(config);
+      setUserGenres(resGenres.data.genres);
+      const updatedBookGenres = bookData.bookGenres.filter(genre => genre.genreId !== genreId);
+      bookData.bookGenres = updatedBookGenres;
+      const updatedFinalBookGenres = finalBookGenres.filter(genre => genre.genreId !== genreId);
+      setFinalBookGenres(updatedFinalBookGenres);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleAddUserAuthor = async () => {
     try {
@@ -283,7 +370,22 @@ const Book = () => {
     } catch (error) {
       console.log(error)
     }
-  }
+  };
+  useEffect(() => {console.log(genreName)}, [genreName])
+  
+  const handleAddUserGenre = async () => {
+    try {
+      const config = {withCredentials: true};
+      const data = {name: genreName};
+      await createGenre(data, config);
+      const res = await getUserGenres(config);
+      setUserGenres(res.data.genres);
+      setGenreName("");
+      setAddNewGenreInputVisible(false);
+    } catch (error) {
+      console.log(error)
+    }
+  };
 
   const handleEditUserAuthor = async (column, value, authorId) => {
     try {
@@ -321,7 +423,45 @@ const Book = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
+
+  const handleEditUserGenre = async (column, value, genreId) => {
+    try {
+      const config = {withCredentials: true};
+      const data = {column: column, value: value};
+      await editGenre(data, config, genreId);
+
+      const res = await getUserGenres(config);
+      setUserGenres(res.data.genres);
+
+      if(column === "color"){
+        for (let i = 0; i < finalBookGenres.length; i++) {
+          const genre = finalBookGenres[i];
+          if(genre.genreId === genreId){
+            genre.color = value;
+          }
+        }
+      }else if(column === "name"){
+        for (let i = 0; i < finalBookGenres.length; i++) {
+          const genre = finalBookGenres[i];
+          if(genre.genreId === genreId){
+            genre.name = value;
+          }
+        }
+      }
+
+
+      if(!deepEqual(colorDropdownVisible ,{})){
+        setColorDropdownVisible({});
+      }else if(!deepEqual(genreNameEditable, {})){
+        setGenreNameEditable({});
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   const handleAuthorsFormSubmit = async () => {
     try {
@@ -347,6 +487,37 @@ const Book = () => {
         window.location.reload();
       }else{
         toggleDropdownOrForm(setAuthorsFormVisible);
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleGenresFormSubmit = async () => {
+    try {
+      const config = { withCredentials: true };
+      const bookId = params.bookId;
+
+      let genresModified = false;
+      if(bookData.bookGenres.length !== finalBookGenres.length){
+        genresModified = true;
+      }else{
+        for (let i = 0; i < bookData.bookGenres.length; i++) {
+          const obj1 = bookData.bookGenres[i];
+          const obj2 = finalBookGenres[i];
+          if (!deepEqual(obj1, obj2)) {
+            genresModified = true;
+            break;
+          }
+      }
+      }
+    
+      if(genresModified){
+        const res = await editBookGenres({bookGenres: finalBookGenres}, config, bookId);
+        window.location.reload();
+      }else{
+        toggleDropdownOrForm(setGenresFormVisible);
       }
 
     } catch (error) {
@@ -444,8 +615,8 @@ const Book = () => {
             </div>
             {/* Authors */}
             <div className="book-property">
-              Authors:{" "}
-              {bookData.bookAuthors.length > 0 ? (
+              Authors:
+              {bookData.bookAuthors && bookData.bookAuthors.length > 0 ? (
                 bookData.bookAuthors.map((author, index) => {
                   const authorColor = colorsData.colors.find(
                     (color) => color.name === author.color
@@ -502,8 +673,8 @@ const Book = () => {
                             color: `#${authorColor.foreground}`,
                           }}
                           key={index}
-                          onClick={(e) => {
-                            handleDeleteBookAuthor(e, author);
+                          onClick={() => {
+                            handleDeleteBookAuthor(author);
                           }}
                         >
                           {author.name}
@@ -550,10 +721,13 @@ const Book = () => {
                                 className="authors-form-author-rename-input"
                                 autoFocus
                                 value={newAuthorName}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
                                 onChange={(e) => {
                                   setNewAuthorName(e.target.value);
                                 }}
-                                onBlur={(e) => {
+                                onBlur={() => {
                                   if (
                                     newAuthorName === author.name ||
                                     newAuthorName === ""
@@ -620,7 +794,7 @@ const Book = () => {
                                   {colorsData &&
                                     colorsData.colors.map((color, index) => (
                                       <div
-                                        className="color-dropdown-option"
+                                        className={author.color === color.name ? "color-dropdown-option selected" : "color-dropdown-option"}
                                         key={index}
                                         onClick={() => {
                                           handleEditUserAuthor(
@@ -675,7 +849,13 @@ const Book = () => {
                     <div className="authors-form-add-new-buttons">
                       <button
                         className="authors-form-add-new-button"
-                        onClick={handleAddUserAuthor}
+                        onClick={() => {
+                          if (authorName == "") {
+                            setAddNewAuthorInputVisible(false);
+                            return;
+                          }
+                          handleAddUserAuthor();
+                        }}
                       >
                         Add
                       </button>
@@ -711,9 +891,287 @@ const Book = () => {
                 </div>
               </div>
             )}
-
             {/* Genres */}
-            <div className="book-property">Genres: {bookData.book.genre}</div>
+            <div className="book-property">
+              Genres:
+              {bookData.bookGenres && bookData.bookGenres.length > 0 ? (
+                bookData.bookGenres.map((genre, index) => {
+                  const genreColor = colorsData.colors.find(
+                    (color) => color.name === genre.color
+                  );
+                  return (
+                    <div
+                      className="book-genre genre big"
+                      style={{
+                        backgroundColor: `#${genreColor.background}`,
+                        color: `#${genreColor.foreground}`,
+                      }}
+                      key={index}
+                      onClick={() => {
+                        toggleDropdownOrForm(setGenresFormVisible);
+                      }}
+                    >
+                      {genre.name}
+                    </div>
+                  );
+                })
+              ) : (
+                <div
+                  className="book-property-empty"
+                  onClick={() => {
+                    toggleDropdownOrForm(setGenresFormVisible);
+                  }}
+                >
+                  {" "}
+                  +
+                </div>
+              )}
+            </div>
+
+            {genresFormVisible && (
+              <div
+                className="book-property-form genres-form"
+                ref={genresFormRef}
+              >
+                <h5>Choose up to 3 genres</h5>
+                <h6 className="genres-form-chosen-heading">Selected:</h6>
+                <div
+                  className="genres-form-chosen-list"
+                  ref={genresFormChosenRef}
+                >
+                  {finalBookGenres &&
+                    finalBookGenres.map((genre, index) => {
+                      const genreColor = colorsData.colors.find(
+                        (color) => color.name === genre.color
+                      );
+                      return (
+                        <div
+                          className="genres-form-genre genres-form-genre-chosen genre small"
+                          style={{
+                            backgroundColor: `#${genreColor.background}`,
+                            color: `#${genreColor.foreground}`,
+                          }}
+                          key={index}
+                          onClick={() => {
+                            handleDeleteBookGenre(genre);
+                          }}
+                        >
+                          {genre.name}
+                        </div>
+                      );
+                    })}
+                </div>
+
+                <div className="genres-form-list" ref={genresFormListRef}>
+                  {userGenres &&
+                    userGenres.map((genre, index) => {
+                      const genreColor = colorsData.colors.find(
+                        (color) => color.name === genre.color
+                      );
+
+                      return (
+                        <div
+                          className="genres-form-list-element"
+                          key={index}
+                          onClick={(e) => {
+                            handleAddBookGenre(e, genre);
+                          }}
+                        >
+                          <div className="genres-form-list-element-left">
+                            <button
+                              className="genres-form-genre-rename-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!deepEqual(genreNameEditable, {})) {
+                                  setGenreNameEditable({});
+                                } else {
+                                  setNewGenreName(genre.name);
+                                  setGenreNameEditable((prevEditable) => ({
+                                    [genre.genreId]:
+                                      !prevEditable[genre.genreId],
+                                  }));
+                                }
+                              }}
+                            >
+                              <img src={editIcon} alt="rename" />
+                            </button>
+                            {genreNameEditable[genre.genreId] ? (
+                              <input
+                                className="genres-form-genre-rename-input"
+                                autoFocus
+                                value={newGenreName}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                                onChange={(e) => {
+                                  setNewGenreName(e.target.value);
+                                }}
+                                onBlur={() => {
+                                  if (
+                                    newGenreName === genre.name ||
+                                    newGenreName === ""
+                                  ) {
+                                    setGenreNameEditable({});
+                                    return;
+                                  }
+                                  handleEditUserGenre(
+                                    "name",
+                                    newGenreName,
+                                    genre.genreId
+                                  );
+                                }}
+                                type="text"
+                              />
+                            ) : (
+                              <div
+                                className="genres-form-genre genre small"
+                                style={{
+                                  backgroundColor: `#${genreColor.background}`,
+                                  color: `#${genreColor.foreground}`,
+                                }}
+                              >
+                                {genre.name}
+                              </div>
+                            )}
+                          </div>
+                          <div className="genres-form-list-element-right">
+                            <button
+                              className="genres-form-genre-delete-button"
+                              onClick={(e) => {
+                                handleDeleteUserGenre(e, genre.genreId);
+                              }}
+                            >
+                              <img src={crossIcon} alt="delete" />
+                            </button>
+                            <button
+                              className="genres-form-genre-change-color-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!deepEqual(colorDropdownVisible, {})) {
+                                  setColorDropdownVisible({});
+                                } else {
+                                  setColorDropdownVisible((prevVisible) => ({
+                                    [genre.genreId]:
+                                      !prevVisible[genre.genreId],
+                                  }));
+                                }
+                              }}
+                            >
+                              <img src={dotsIcon} alt="color" />
+                            </button>
+
+                            {colorDropdownVisible[genre.genreId] && (
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                                ref={colorDropdownRef}
+                                className="book-property-dropdown genres-form-dropdown color-dropdown"
+                              >
+                                <h6>Choose color:</h6>
+                                <div className="color-dropdown-options">
+                                  {colorsData &&
+                                    colorsData.colors.map((color, index) => (
+                                      <div
+                                      className={genre.color === color.name ? "color-dropdown-option selected" : "color-dropdown-option"}
+                                        key={index}
+                                        onClick={() => {
+                                          handleEditUserGenre(
+                                            "color",
+                                            color.name,
+                                            genre.genreId
+                                          );
+                                        }}
+                                      >
+                                        <div
+                                          className="color-dropdown-option-color"
+                                          style={{
+                                            backgroundColor: `#${color.foreground}`,
+                                          }}
+                                        ></div>
+                                        <div className="color-dropdown-option-name">
+                                          {color.name}
+                                        </div>
+                                      </div>
+                                    ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+
+                {/* Add author button*/}
+
+                <div className="genres-form-add-new">
+                  {addNewGenreInputVisible ? (
+                    <div className="genres-form-add-new editable">
+                      <input
+                        autoFocus
+                        type="text"
+                        className="genres-form-add-new-input"
+                        value={genreName}
+                        onChange={(e) => {
+                          setGenreName(e.target.value);
+                        }}
+                      />
+                      <div className="genres-form-add-new-buttons">
+                        <button
+                          className="genres-form-add-new-button"
+                          onClick={() => {
+                            if (genreName == "") {
+                              setAddNewGenreInputVisible(false);
+                              return;
+                            }
+                            handleAddUserGenre();
+                          }}
+                        >
+                          Add
+                        </button>
+                        <button
+                          className="genres-form-add-new-button"
+                          onClick={() => {
+                            setGenreName("");
+                            setAddNewGenreInputVisible(false);
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      className="genres-form-add-new-button"
+                      onClick={() => {
+                        setAddNewGenreInputVisible(true);
+                      }}
+                    >
+                      <b>+</b> Add genre
+                    </button>
+                  )}
+                </div>
+
+                {/* Save, cancel btns */}
+                <div className="genres-form-buttons">
+                  <button
+                    className="genres-form-save-button button"
+                    onClick={handleGenresFormSubmit}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="genres-form-cancel-button button empty"
+                    onClick={() => {
+                      toggleDropdownOrForm(setGenresFormVisible);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
             {/* Score */}
             <div className="book-property">
               Score:{" "}
@@ -827,7 +1285,6 @@ const Book = () => {
               )}
             </div>
             {/* Summary */}
-
             <div className="book-property summary">
               Summary:{" "}
               {summaryEditable ? (
@@ -879,13 +1336,13 @@ const Book = () => {
         </>
       )}
 
-      <button onClick={handleDelete} className="book-delete-button">
+      <button onClick={handleDelete} className="book-delete-button delete-button">
         Delete
       </button>
 
       <div
         id="overlay"
-        style={authorsFormVisible ? { display: "block" } : { display: "none" }}
+        style={authorsFormVisible || genresFormVisible ? { display: "block" } : { display: "none" }}
       ></div>
     </div>
   );

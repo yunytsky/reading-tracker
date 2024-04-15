@@ -11,7 +11,7 @@ const Header = () => {
             <nav className="header-nav">
                 <div className="header-nav-left">
                     <NavLink to="/library" className={({ isActive }) => (isActive ? "active" : "")}>Library</NavLink>
-                    <NavLink to="/review" className={({ isActive }) => (isActive ? "active" : "")}>Review</NavLink>
+                    <NavLink to="/review/books-stats" className={({ isActive }) => (isActive ? "active" : "")}>Review</NavLink>
                 </div>
                 <div className="header-nav-right">
                     <NavLink to="/profile" className={({ isActive }) => (isActive ? "active" : "")}>Profile</NavLink>

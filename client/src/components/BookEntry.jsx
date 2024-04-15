@@ -7,10 +7,11 @@ const BookEntry = (props) => {
     const [plannedColors, setPlannedColors] = useState({});
     const [noneColors, setNoneColors] = useState({});
 
-    const [finishedReadingYear, setFinishedReadingYear] = useState(null);
+    // const [finishedReadingYear, setFinishedReadingYear] = useState(null);
 
+    //Set colors and a year
     useEffect(() => {
-        if(props.colors){
+        if(props.colors.length > 0){
             const red = props.colors.find(color => color.name === 'red');
             const green = props.colors.find(color => color.name === 'green');
             const blue = props.colors.find(color => color.name === 'blue');
@@ -22,13 +23,14 @@ const BookEntry = (props) => {
             setNoneColors({backgroundColor: `#${gray.background}`, color: `#${gray.foreground}`});
         }
 
-        if(props.status === "finished" && props.finishedReading) {
-          const date = new Date(props.finishedReading);
-          const year = date.getFullYear();
-          setFinishedReadingYear(year);
-        }
+        // if(props.status === "finished" && props.finishedReading) {
+        //   const date = new Date(props.finishedReading);
+        //   const year = date.getFullYear();
+        //   setFinishedReadingYear(year);
+        // }
 
-    }, [])
+
+    }, [props.books])
 
     return (
       <Link to={`/library/book/${props.bookId}`} className="book-entry">
@@ -61,9 +63,9 @@ const BookEntry = (props) => {
           <h6 className="book-entry-name">{props.name}</h6>
         </div>
         <div className="book-entry-right">
-          {finishedReadingYear && (
+          {props.finishedReadingYear && (
             <div className="book-entry-year">
-              {finishedReadingYear}
+              {props.finishedReadingYear}
             </div>
           )}
           <div

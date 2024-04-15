@@ -35,11 +35,25 @@ export function addUserAuthor(authorName, userId) {
     `, [authorName, userId]);
 };
 
+export function addUserGenre(genreName, userId) {
+    return pool.execute(`
+        INSERT INTO genres(name, userId)
+        VALUES(?,?)
+    `, [genreName, userId]);
+};
+
 export function deleteUserAuthor(authorId, userId) {
     return pool.execute(`
         DELETE FROM authors
-        WHERE authorId = ? 
-    `, [authorId]);
+        WHERE authorId = ? AND userId = ?
+    `, [authorId, userId]);
+}
+
+export function deleteUserGenre(genreId, userId) {
+    return pool.execute(`
+        DELETE FROM genres
+        WHERE genreId = ? AND userId = ?
+    `, [genreId, userId]);
 }
 
 export function editUserAuthor(column, value, authorId, userId) {
@@ -50,7 +64,41 @@ export function editUserAuthor(column, value, authorId, userId) {
     `, [value, authorId, userId]);
 }
 
-export function getUserBooks(userId) {
+export function editUserGenre(column, value, genreId, userId) {
+    return pool.execute(`
+        UPDATE genres
+        SET ${column} = ?
+        WHERE genreId = ? AND userId = ?
+    `, [value, genreId, userId]);
+}
+
+export function getUserBooks(userId, filter) {
+    if (filter) {
+        let filterString = "";
+        let filterValues = [];
+
+        const filterNames = Object.keys(filter);
+        
+        for (let i = 1; i < filterNames.length; i++) {
+            const filterName = filterNames[i];
+            const value = filter[filterName];
+            if(!value){
+                filterString += `AND ${filterName} IS NULL `;
+            }else{
+                const valuesArray = value.split(",").map(value => value.trim()); 
+                const placeholders = valuesArray.map(() => '?').join(', '); // Create placeholders for each value    
+                filterString += `AND ${filterName} IN (${placeholders}) `;
+                filterValues.push(...valuesArray)
+            }
+
+        }
+
+        return pool.execute(`
+            SELECT * FROM books 
+            WHERE userId = ? ${filterString}
+        `, [userId, ...filterValues]);
+    }
+
     return pool.execute(`
         SELECT * FROM books 
         WHERE userId = ?
@@ -64,7 +112,7 @@ export function getUserBook(userId, bookId) {
     `, [userId, bookId]);
 }
 
-export async function getBookAuthors(bookId) {
+export async function getBookEntryAuthors(bookId) {
     const [bookAuthors] = await pool.execute(`
         SELECT * FROM bookauthors 
         WHERE bookId = ?
@@ -83,7 +131,7 @@ export async function getBookAuthors(bookId) {
     }
 }
 
-export async function getBookGenres(bookId) {
+export async function getBookEntryGenres(bookId) {
     const [bookGenres] = await pool.execute(`
         SELECT * FROM bookgenres 
         WHERE bookId = ?
@@ -100,6 +148,12 @@ export async function getBookGenres(bookId) {
     }else{
         return [[]];
     }
+}
+
+export async function getBookEntriesGenres() {
+    return pool.execute(`
+        SELECT * FROM bookgenres
+    `);
 }
 
 export function getUserGenres(userId) {
@@ -160,6 +214,13 @@ export function addBookEntryAuthor(bookId, authorId) {
     `, [bookId, authorId]);
 }
 
+export function addBookEntryGenre(bookId, genreId) {
+    return pool.execute(`
+        INSERT INTO bookgenres
+        VALUES(?, ?)
+    `, [bookId, genreId]);
+}
+
 export function deleteBookEntryAuthor(bookId, authorId) {
     return pool.execute(`
         DELETE FROM bookauthors
@@ -167,11 +228,25 @@ export function deleteBookEntryAuthor(bookId, authorId) {
     `, [bookId, authorId]);
 }
 
+export function deleteBookEntryGenre(bookId, genreId) {
+    return pool.execute(`
+        DELETE FROM bookgenres
+        WHERE bookId = ? AND genreId = ?
+    `, [bookId, genreId]);
+}
+
 export function deleteBookEntriesAuthors(authorId) {
     return pool.execute(`
         DELETE FROM bookauthors
         WHERE authorId = ?
     `, [authorId]);
+}
+
+export function deleteBookEntriesGenres(genreId) {
+    return pool.execute(`
+        DELETE FROM bookgenres
+        WHERE genreId = ?
+    `, [genreId]);
 }
 
 export function getBookOwner(bookId) {
@@ -192,4 +267,11 @@ export function getColors() {
     return pool.execute(`
         SELECT * FROM colors;
     `);
+}
+
+export function getFinishedBooksYears(userId) {
+    return pool.execute(`
+        SELECT finishedReading FROM books
+        WHERE userId = ? AND finishedReading IS NOT NULL
+    `, [userId])
 }

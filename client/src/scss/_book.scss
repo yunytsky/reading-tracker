@@ -89,14 +89,14 @@
     font-weight: normal;
 }
 
-.book-author:first-of-type, .book-status:first-of-type, .book-finished-reading, .book-score{
+.book-author:first-of-type, .book-status:first-of-type, .book-finished-reading, .book-score, .book-genre:first-of-type{
     margin-left: 8px;
 }
-.book-author, .book-status, .book-name, .book-score, .book-summary, .book-finished-reading{
+.book-author, .book-status, .book-name, .book-score, .book-summary, .book-finished-reading, .book-genre{
     cursor: pointer;
 }
 
-.author{
+.author, .genre{
     @include body-3;
     @include medium;
     border-radius: 100px;
@@ -111,7 +111,7 @@
     }
 }
 
-.author.big{
+.author.big, .genre.big{
     @include body-2;
     font-weight: normal;
 }
@@ -155,20 +155,6 @@
     }
 }
 
-.book-delete-button{
-    @include button-2;
-    color: $red;
-    border: 1px solid $red;
-    border-radius: 100px;
-    padding: 8px 32px;
-    &:hover, &:focus{
-        color: darken($color: $red, $amount: 20%);
-        border: 1px solid darken($color: $red, $amount: 30%);
-    }
-    &:active{
-        background-color: lighten($color: $red, $amount: 36%);
-    }
-}
 
 .book-property-dropdown{
     position: absolute;
@@ -181,7 +167,7 @@
     box-shadow: $shadow-main;
 }
 
-.authors-form-dropdown{
+.authors-form-dropdown, .genres-form-dropdown{
     padding: 0.5em 0;
     min-width: 30%;
     top: 50%;
@@ -247,7 +233,7 @@
 
 }
 
-.status-dropdown-option.selected, .score-dropdown-option.selected, .finished-reading-dropdown-option.selected{
+.status-dropdown-option.selected, .score-dropdown-option.selected, .finished-reading-dropdown-option.selected, .color-dropdown-option.selected{
     background-color: $black-5;
 }
 
