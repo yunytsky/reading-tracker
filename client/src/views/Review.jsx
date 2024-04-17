@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import Breadcrumbs from "../components/Breadcrumbs";
 import { NavLink, Outlet } from "react-router-dom";
 import arrowIcon from "../assets/arrow.svg";
-import { getBooks } from "../api";
+import { getBooks, getYearRange } from "../api";
 
 const Review = () => {
   const [yearFilterDropdownVisible, setYearFilterDropdownVisible] = useState(false);
   const yearFilterDropdownButtonRef = useRef(null);
   const yearFilterDropdownRef = useRef(null);
-  const [years, setYears] = useState([]);
+  const [allYears, setAllYears] = useState([]);
   const [selectedYears, setSelectedYears] = useState([]);
 
   //Hide dropdown menu/form when clicked elsewhere
@@ -35,26 +35,11 @@ const Review = () => {
     const fetchData = async () => {
       try {
         //Set years
-        const config = { withCredentials: true };
-        const res = await getBooks(config);
-
-        const finishedBooks = res.data.books.filter(
-          (book) => book.status === "finished"
-        );
-        const finishedBooksYears = finishedBooks.map((book) =>
-          new Date(book.finishedReading).getFullYear()
-        );
-
-        const minYear = Math.min(...finishedBooksYears);
-        const currentYear = new Date().getFullYear();
-
-        const years = Array.from(
-          { length: currentYear - minYear + 1 },
-          (_, i) => currentYear - i
-        );
-
-        setYears(years);
-        setSelectedYears(years);
+        const config = {withCredentials: true};
+        const yearsRes = await getYearRange(config);
+        
+        setAllYears(yearsRes.data.yearRange);
+        setSelectedYears(yearsRes.data.yearRange);
         
       } catch (error) {
         console.log(error);
@@ -100,7 +85,17 @@ const Review = () => {
           >
             <div className="filter-name">Year</div>{" "}
             <div className="filter-selected">
-              <span className="filter-selected-name">All years</span>
+              <span
+                className={
+                  selectedYears.length === allYears.length
+                    ? "filter-selected-name all"
+                    : "filter-selected-name"
+                }
+              >
+                {selectedYears.length === allYears.length
+                  ? "All years"
+                  : selectedYears.length}
+              </span>
               <img className="filter-arrow" src={arrowIcon} />
             </div>
             {yearFilterDropdownVisible && (
@@ -112,23 +107,38 @@ const Review = () => {
                 className="filter-dropdown"
               >
                 <div className="filter-dropdown-options">
-                  {years &&
-                    years.map((year, index) => (
-                      <label  key={index} className="filter-dropdown-option finished-reading-filter-dropdown-option">
+                  {allYears &&
+                    allYears.map((year, index) => (
+                      <label
+                        key={index}
+                        className="filter-dropdown-option finished-reading-filter-dropdown-option"
+                      >
                         <input
                           type="checkbox"
                           value={year}
                           name="finished-reading-year"
-                          checked={selectedYears.some(selectedYear => selectedYear === year)}
+                          checked={selectedYears.some(
+                            (selectedYear) => selectedYear === year
+                          )}
                           onChange={() => {
-                              if(selectedYears.some(selectedYear => selectedYear === year)){
-                                setSelectedYears(prevSelectedYears => {
-                                  return prevSelectedYears.filter(prevSelectedYear => prevSelectedYear !== year);
-                                });
-                              }else{
-                                setSelectedYears(prevSelectedYears => [...prevSelectedYears, year])
-                              }
-                            }}
+                            if (
+                              selectedYears.some(
+                                (selectedYear) => selectedYear === year
+                              )
+                            ) {
+                              setSelectedYears((prevSelectedYears) => {
+                                return prevSelectedYears.filter(
+                                  (prevSelectedYear) =>
+                                    prevSelectedYear !== year
+                                );
+                              });
+                            } else {
+                              setSelectedYears((prevSelectedYears) => [
+                                ...prevSelectedYears,
+                                year,
+                              ]);
+                            }
+                          }}
                         />
                         {year}
                       </label>
@@ -136,10 +146,20 @@ const Review = () => {
                 </div>
 
                 <div className="filter-dropdown-actions">
-                  <button className="filter-dropdown-action-button" onClick={() => {setSelectedYears(years);}}>
+                  <button
+                    className="filter-dropdown-action-button"
+                    onClick={() => {
+                      setSelectedYears(allYears);
+                    }}
+                  >
                     Select all
-                  </button> 
-                  <button className="filter-dropdown-action-button" onClick={() => {setSelectedYears([]);}}>
+                  </button>
+                  <button
+                    className="filter-dropdown-action-button"
+                    onClick={() => {
+                      setSelectedYears([]);
+                    }}
+                  >
                     Deselect all
                   </button>
                 </div>
@@ -149,7 +169,7 @@ const Review = () => {
         </div>
       </div>
 
-      <Outlet context={[years, selectedYears]}/>
+      <Outlet context={[allYears, selectedYears]} />
     </div>
   );
 };

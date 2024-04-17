@@ -4,8 +4,12 @@ import { useEffect, useState } from "react";
 import { getBooks, getBooksGenres, getColors, getUserGenres } from "../../api";
 import uniqolor from "uniqolor";
 import randomColor from "randomcolor";
+import { useOutletContext } from "react-router-dom";
+import { arraysEqual } from "../../utils";
 
 const GenreStats = () => {
+  const [allYears, selectedYears] = useOutletContext();
+
   const options = {
     responsive: true,
     plugins: {
@@ -20,33 +24,32 @@ const GenreStats = () => {
   };
 
   const [data, setData] = useState([]);
-
   const [labels, setLabels] = useState([]);
+
   const [colors, setColors] = useState([]);
 
-  const chartData = {
-      labels, 
-      datasets: [
-          {
-              label: "Read",
-              data: data,
-              backgroundColor: colors,
-              borderRadius: 5
-          },
-      ],
-  };
-
-
-  //Fetch data 
+  //Fetch data + on filter
   useEffect(() => {
     const fetchData = async () => {
       try {
+        selectedYears.sort();
+
         // Fetch user genres and books
         const config = { withCredentials: true };
 
+        let queryString;
+        if(!arraysEqual(allYears, selectedYears)){
+          queryString = "?filter=true";
+        }
+
+        if(!arraysEqual(allYears, selectedYears)){
+            const formattedYears = selectedYears.map(year => year+"-01-01");
+            queryString += `&finishedReading=${formattedYears.join("%2C%20")}`
+        }
+
         const [resUserGenres, resBooks, resBooksGenres, resColors] = await Promise.all([
           getUserGenres(config),
-          getBooks(config),
+          getBooks(config, queryString),
           getBooksGenres(config),
           getColors()
         ]);
@@ -82,7 +85,7 @@ const GenreStats = () => {
         
         setColors(genreColorsValues);
         
-        //Setting random colors with uniqolor
+        //Setting random colors with uniqolor:
         // const genreColorsValues = genreNames.map(genreName => uniqolor(genreName).color);
         // setColors(genreColorsValues)
 
@@ -92,7 +95,22 @@ const GenreStats = () => {
       }
     }
     fetchData();
-  }, [])
+  }, [selectedYears])
+
+  
+  const chartData = {
+      labels, 
+      datasets: [
+          {
+              label: "Read",
+              data: data,
+              backgroundColor: colors,
+              borderRadius: 5
+          },
+      ],
+  };
+
+
 
   return (
     <div className="chart doughnut-chart">
