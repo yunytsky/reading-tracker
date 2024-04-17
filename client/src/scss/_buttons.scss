@@ -45,3 +45,13 @@
         }
     }
 }
+
+.button.red{
+    background-color: $red;
+    &:hover, &:focus{
+        background-color: darken($color: $red, $amount: 3%); 
+     }
+     &:active{
+         background-color: darken($color: $red, $amount: 5%); 
+     }
+}

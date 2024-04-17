@@ -254,3 +254,44 @@
         color: $black-50;
     }
 }
+
+.book-delete-warning{
+    background-color: $white;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    border: 1px solid $black-10;
+    box-shadow: $shadow-main;
+    border-radius: 4px;
+    text-align: center;
+    padding: 1.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    h4{
+        margin-bottom: .5em;
+    }
+    img{
+        filter: $red-svg;
+        width: 64px;
+    }
+    p{
+        color: $black-75;
+        @include body-2;
+        margin-bottom: 2.5em;
+        max-width: 85%;
+    }
+}
+
+.book-delete-warning-buttons{
+    .button{
+        padding: 4px 18px;
+        margin-right: 1em;
+        &:last-child{
+            margin-right: 0;
+        }
+    }
+}

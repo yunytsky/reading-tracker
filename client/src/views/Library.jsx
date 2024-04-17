@@ -14,7 +14,6 @@ const Library = () => {
   const [allStatuses, setAllStatuses] = useState(["finished", "none", "planned", "reading"]);
   const [selectedStatuses, setSelectedStatuses] = useState(["finished", "none", "planned", "reading"]);
 
-
   //Set years and colors
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +35,6 @@ const Library = () => {
 
     fetchData();
   }, [])
-
 
   // Fetch data + on filter
   useEffect(() => {

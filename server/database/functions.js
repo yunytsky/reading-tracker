@@ -235,6 +235,20 @@ export function deleteBookEntryGenre(bookId, genreId) {
     `, [bookId, genreId]);
 }
 
+export function deleteBookEntryAuthors(bookId) {
+    return pool.execute(`
+        DELETE FROM bookauthors
+        WHERE bookId = ?
+    `, [bookId]);
+}
+
+export function deleteBookEntryGenres(bookId) {
+    return pool.execute(`
+        DELETE FROM bookgenres
+        WHERE bookId = ?
+    `, [bookId]);
+}
+
 export function deleteBookEntriesAuthors(authorId) {
     return pool.execute(`
         DELETE FROM bookauthors
@@ -248,6 +262,7 @@ export function deleteBookEntriesGenres(genreId) {
         WHERE genreId = ?
     `, [genreId]);
 }
+
 
 export function getBookOwner(bookId) {
     return pool.execute(`

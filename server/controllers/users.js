@@ -1,4 +1,4 @@
-import { getUserBooks, getUserBook, addBookEntry, editBookEntry, getBookOwner, deleteBookEntry, getBookEntryAuthors, getUserAuthors, addUserAuthor, deleteBookEntryAuthor, addBookEntryAuthor, deleteUserAuthor, deleteBookEntriesAuthors, editUserAuthor, getUserGenres, deleteBookEntryGenre, addBookEntryGenre, editUserGenre, deleteBookEntriesGenres, addUserGenre, deleteUserGenre, getBookEntriesGenres, getBookEntryGenres, getFinishedBooksYears } from "../database/functions.js";
+import { getUserBooks, getUserBook, addBookEntry, editBookEntry, getBookOwner, deleteBookEntry, getBookEntryAuthors, getUserAuthors, addUserAuthor, deleteBookEntryAuthor, addBookEntryAuthor, deleteUserAuthor, deleteBookEntriesAuthors, editUserAuthor, getUserGenres, deleteBookEntryGenre, addBookEntryGenre, editUserGenre, deleteBookEntriesGenres, addUserGenre, deleteUserGenre, getBookEntriesGenres, getBookEntryGenres, getFinishedBooksYears, deleteBookEntryGenres, deleteBookEntryAuthors } from "../database/functions.js";
 
 export async function getBooks(req, res) {
     try {
@@ -80,16 +80,22 @@ export async function editBook(req, res) {
 
 export async function deleteBook(req, res) {
     try {
+        //Check id user owns this book
         const [bookOwner] = await getBookOwner(req.params.bookId);
         if(bookOwner.length === 0 || bookOwner[0].userId != req.user.sub) {
             return res.status(403).json({error: true, message: "Forbidden"});
         }
 
+        //Delete references (from bookgenres)
+        await deleteBookEntryGenres(req.params.bookId);
+        //Delete references (from bookauthors)
+        await deleteBookEntryAuthors(req.params.bookId);
+
         await deleteBookEntry(req.params.bookId);
         return res.status(200).json({error: false, message: "Successfully deleted"});
 
     } catch (error) {
-          return res.status(500).json({ error: true, message: error.message }); 
+        return res.status(500).json({ error: true, message: error.message }); 
     }
 
 }

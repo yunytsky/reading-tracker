@@ -1,13 +1,14 @@
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 import { createAuthor, createGenre, deleteAuthor, deleteBook, deleteGenre, editAuthor, editBook, editBookAuthors, editBookGenres, editGenre, getBook, getColors, getUserAuthors, getUserGenres } from "../api";
 import { useEffect, useRef, useState } from "react";
+import { deepEqual } from "../utils";
 import Breadcrumbs from "../components/Breadcrumbs";
 
 import starIcon from "../assets/star.svg";
 import dotsIcon from "../assets/dots.svg";
 import editIcon from "../assets/edit.svg";
 import crossIcon from "../assets/cross.svg";
-import { deepEqual } from "../utils";
+import warningIcon from "../assets/warning.svg";
 
 
 const Book = () => {
@@ -40,6 +41,9 @@ const Book = () => {
   const finishedReadingDropdownButtonRef = useRef(null);
   //Summary
   const [summaryEditable, setSummaryEditable] = useState(false);
+  //Delete book warning popup
+  const [deleteBookWarningVisible, setDeleteBookWarningVisible] = useState(false);
+  const deleteBookWarningRef = useRef(null);
   //-------------------------------------------------
 
   //-------------------------------------------------
@@ -79,80 +83,86 @@ const Book = () => {
     setVisible((prevVisible) => !prevVisible);
   };
 
-  //Hide dropdown menu/form when clicked elsewhere
+  //Hide dropdown menu/form/popup when clicked elsewhere
   useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (
-          statusDropdownRef.current !== null &&
-          !statusDropdownRef.current.contains(event.target) &&
-          statusDropdownButtonRef.current !== null &&
-          !statusDropdownButtonRef.current.contains(event.target)
-        ) {
-          setStatusDropdownVisible(false);
-        } else if (
-          scoreDropdownRef.current !== null &&
-          !scoreDropdownRef.current.contains(event.target) &&
-          scoreDropdownButtonRef.current !== null &&
-          !scoreDropdownButtonRef.current.contains(event.target)
-        ) {
-          setScoreDropdownVisible(false);
-        } else if (
-          finishedReadingDropdownRef.current !== null &&
-          !finishedReadingDropdownRef.current.contains(event.target) &&
-          finishedReadingDropdownButtonRef.current !== null &&
-          !finishedReadingDropdownButtonRef.current.contains(event.target)
-        ) {
-          setFinishedReadingDropdownVisible(false);
-        } else if (
-          authorsFormRef.current != null &&
-          !authorsFormRef.current.contains(event.target)
-        ) {
-          setAuthorsFormVisible(false);
-          if (colorDropdownVisible) {
-            setColorDropdownVisible(false);
-          }
-        }  else if (
-          genresFormRef.current !== null &&
-          !genresFormRef.current.contains(event.target)
-        ) {
-          setGenresFormVisible(false);
-          if (colorDropdownVisible) {
-            setColorDropdownVisible(false);
-          }
-        } else if (
-          colorDropdownRef.current !== null &&
-          !colorDropdownRef.current.contains(event.target) &&
-          authorsFormListRef.current !== null
+    const handleClickOutside = (event) => {
+      if (
+        statusDropdownRef.current !== null &&
+        !statusDropdownRef.current.contains(event.target) &&
+        statusDropdownButtonRef.current !== null &&
+        !statusDropdownButtonRef.current.contains(event.target)
       ) {
-          // Close all color dropdowns
-          let buttonClicked = false;
-          const buttons = authorsFormListRef.current.querySelectorAll(".authors-form-author-change-color-button");
-          for (let i = 0; i < buttons.length; i++) {
-            const button = buttons[i];
-            if(button.contains(event.target)){
-              buttonClicked = true;
-              break;
-            }
+        setStatusDropdownVisible(false);
+      } else if (
+        scoreDropdownRef.current !== null &&
+        !scoreDropdownRef.current.contains(event.target) &&
+        scoreDropdownButtonRef.current !== null &&
+        !scoreDropdownButtonRef.current.contains(event.target)
+      ) {
+        setScoreDropdownVisible(false);
+      } else if (
+        finishedReadingDropdownRef.current !== null &&
+        !finishedReadingDropdownRef.current.contains(event.target) &&
+        finishedReadingDropdownButtonRef.current !== null &&
+        !finishedReadingDropdownButtonRef.current.contains(event.target)
+      ) {
+        setFinishedReadingDropdownVisible(false);
+      } else if (
+        authorsFormRef.current != null &&
+        !authorsFormRef.current.contains(event.target)
+      ) {
+        setAuthorsFormVisible(false);
+        if (colorDropdownVisible) {
+          setColorDropdownVisible(false);
+        }
+      } else if (
+        deleteBookWarningRef.current != null &&
+        !deleteBookWarningRef.current.contains(event.target)
+      ) {
+        setDeleteBookWarningVisible(false);
+      } else if (
+        genresFormRef.current !== null &&
+        !genresFormRef.current.contains(event.target)
+      ) {
+        setGenresFormVisible(false);
+        if (colorDropdownVisible) {
+          setColorDropdownVisible(false);
+        }
+      } else if (
+        colorDropdownRef.current !== null &&
+        !colorDropdownRef.current.contains(event.target) &&
+        authorsFormListRef.current !== null
+      ) {
+        // Close all color dropdowns
+        let buttonClicked = false;
+        const buttons = authorsFormListRef.current.querySelectorAll(
+          ".authors-form-author-change-color-button"
+        );
+        for (let i = 0; i < buttons.length; i++) {
+          const button = buttons[i];
+          if (button.contains(event.target)) {
+            buttonClicked = true;
+            break;
           }
+        }
 
-          if(!buttonClicked){
-            setColorDropdownVisible({});
-          }
+        if (!buttonClicked) {
+          setColorDropdownVisible({});
+        }
       }
-        
-      };
+    };
 
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   //Restrict screen height when form is visible
   useEffect(() => {
       // Function to handle body styles when the add book form is visible
       const handleBodyStyles = () => {
-        if (authorsFormVisible) {
+        if (authorsFormVisible || genresFormVisible) {
           document.body.style.height = "100vh";
           document.body.style.overflow = "hidden";
         } else {
@@ -161,14 +171,14 @@ const Book = () => {
         }
       };
 
-      handleBodyStyles(); // Call it initially
+      handleBodyStyles(); 
 
       return () => {
         // Clean up
         document.body.style.height = "auto";
         document.body.style.overflow = "visible";
       };
-  }, [authorsFormVisible]);
+  }, [authorsFormVisible, genresFormVisible]);
     
   //-------------------------------------------------
 
@@ -1336,13 +1346,25 @@ const Book = () => {
         </>
       )}
 
-      <button onClick={handleDelete} className="book-delete-button delete-button">
+      <button onClick={() => {toggleDropdownOrForm(setDeleteBookWarningVisible)}} className="book-delete-button delete-button">
         Delete
       </button>
 
+      {deleteBookWarningVisible && (
+        <div className="book-delete-warning" ref={deleteBookWarningRef}>
+          <img src={warningIcon} alt="warning" />
+          <h4>Are you sure?</h4>
+          <p>Do you really want to delete the book? This process cannot be undone</p>
+          <div className="book-delete-warning-buttons">
+            <button className="book-delete-warning-cancel-button button empty" onClick={() => {toggleDropdownOrForm(setDeleteBookWarningVisible)}} >Cancel</button>
+            <button className="book-delete-warning-delete-button button red" onClick={handleDelete}>Delete</button>
+          </div>
+        </div>
+      )}
+
       <div
         id="overlay"
-        style={authorsFormVisible || genresFormVisible ? { display: "block" } : { display: "none" }}
+        style={authorsFormVisible || genresFormVisible || deleteBookWarningVisible ? { display: "block" } : { display: "none" }}
       ></div>
     </div>
   );

@@ -55,6 +55,7 @@ const LibraryToolbar = ({
   useEffect(() => {
     const handleBodyStyles = () => {
       if (addBookFormVisible) {
+        window.scrollTo(0, 0);
         document.body.style.height = "100vh";
         document.body.style.overflow = "hidden";
       } else if (yearFilterDropdownVisible) {
@@ -313,38 +314,56 @@ const LibraryToolbar = ({
         </button>
       </div>
 
-      <form
-        className="add-book-form"
-        ref={addBookFormRef}
-        style={addBookFormVisible ? { display: "flex" } : { display: "none" }}
-      >
-        <label className="add-book-form-label form-label" htmlFor="book-name">
-          <h5>Enter a book name:</h5>
-        </label>
+      {addBookFormVisible && (
+        <form className="add-book-form" ref={addBookFormRef}>
+          <label className="add-book-form-label form-label" htmlFor="book-name">
+            <h5>Enter a book name:</h5>
+          </label>
 
-        <textarea 
-          className={bookNameError ? "add-book-form-input form-input error" : "add-book-form-input form-input"}
-          type="text"
-          id="book-name"
-          name="book-name"
-          value={bookName}
-          onChange={(e) => {
-            setBookName(e.target.value);
-          }}
-          required></textarea>
+          <textarea
+            className={
+              bookNameError
+                ? "add-book-form-input form-input error"
+                : "add-book-form-input form-input"
+            }
+            type="text"
+            id="book-name"
+            name="book-name"
+            value={bookName}
+            onChange={(e) => {
+              setBookName(e.target.value);
+            }}
+            required
+            rows={4}
+          ></textarea>
 
-        {bookNameError && <div className="add-book-form-error">Enter a book name</div>}
+          {bookNameError && (
+            <div className="add-book-form-error">Enter a book name</div>
+          )}
 
-        <button
-          type="submit"
-          className="button"
-          onClick={(e) => {
-            handleAddBook(e);
-          }}
-        >
-          Add
-        </button>
-      </form>
+          <div className="add-book-form-buttons">
+            <button
+            type="button"
+            className="button empty"
+            onClick={() => {
+              setAddBookFormVisible(prevVisible => !prevVisible)
+            }}
+          >
+            Cancel
+            </button>
+            <button
+                type="submit"
+                className="button"
+                onClick={(e) => {
+                  handleAddBook(e);
+                }}
+              >
+                Add
+              </button>
+          </div>
+
+        </form>
+      )}
 
       <div
         id="overlay"

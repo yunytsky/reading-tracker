@@ -555,9 +555,17 @@ body {
   z-index: 999;
   border: 1px solid #E6E6E7;
 }
-.add-book-form .button {
+
+.add-book-form-buttons {
+  text-align: center;
+}
+.add-book-form-buttons .button {
   margin: 0 auto;
   padding: 6px 24px;
+  margin-right: 0.5em;
+}
+.add-book-form-buttons .button:last-child {
+  margin-right: 0;
 }
 
 .add-book-form-input {
@@ -792,6 +800,16 @@ body {
 }
 .button.empty:disabled a {
   color: #BFBFC3;
+}
+
+.button.red {
+  background-color: #F9455A;
+}
+.button.red:hover, .button.red:focus {
+  background-color: #f9364d;
+}
+.button.red:active {
+  background-color: #f82c44;
 }
 
 .book-entries {
@@ -1071,4 +1089,44 @@ body {
 }
 .book-property-empty:hover, .book-property-empty:active {
   color: #808086;
+}
+
+.book-delete-warning {
+  background-color: #fff;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  border: 1px solid #E6E6E7;
+  box-shadow: rgba(33, 35, 38, 0.1) 0px 10px 10px -10px;
+  border-radius: 4px;
+  text-align: center;
+  padding: 1.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.book-delete-warning h4 {
+  margin-bottom: 0.5em;
+}
+.book-delete-warning img {
+  filter: brightness(0%) invert(36%) sepia(88%) saturate(1527%) hue-rotate(327deg) brightness(98%) contrast(100%);
+  width: 64px;
+}
+.book-delete-warning p {
+  color: #40404A;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 2.5em;
+  max-width: 85%;
+}
+
+.book-delete-warning-buttons .button {
+  padding: 4px 18px;
+  margin-right: 1em;
+}
+.book-delete-warning-buttons .button:last-child {
+  margin-right: 0;
 }
