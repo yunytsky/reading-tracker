@@ -1,15 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import Breadcrumbs from "../components/Breadcrumbs";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLoaderData, useLocation, useNavigate } from "react-router-dom";
 import arrowIcon from "../assets/arrow.svg";
 import { getBooks, getYearRange } from "../api";
 
 const Review = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [yearFilterDropdownVisible, setYearFilterDropdownVisible] = useState(false);
   const yearFilterDropdownButtonRef = useRef(null);
   const yearFilterDropdownRef = useRef(null);
   const [allYears, setAllYears] = useState([]);
   const [selectedYears, setSelectedYears] = useState([]);
+
+  //Navigate to the book-stats if no tab is chosen
+  useEffect(() => {
+    if(location.pathname === "/review"){
+      navigate("/review/books-stats")
+    }
+  }, [location])
 
   //Hide dropdown menu/form when clicked elsewhere
   useEffect(() => {

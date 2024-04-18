@@ -228,9 +228,24 @@ body {
 .breadcrumbs {
   font-size: 0.875rem;
   line-height: 1.2;
-  color: #40404A;
   margin-bottom: 8px;
+}
+
+.breadcrumb {
+  color: #40404A;
   text-transform: capitalize;
+}
+.breadcrumb:hover {
+  color: #01000D;
+}
+
+.breadcrumb.last {
+  color: #01000D;
+  cursor: auto;
+}
+
+.breadcrumb.book-name {
+  text-transform: none;
 }
 
 .logo {
@@ -1091,7 +1106,7 @@ body {
   color: #808086;
 }
 
-.book-delete-warning {
+.delete-warning {
   background-color: #fff;
   position: absolute;
   left: 50%;
@@ -1108,14 +1123,14 @@ body {
   align-items: center;
   justify-content: center;
 }
-.book-delete-warning h4 {
+.delete-warning h4 {
   margin-bottom: 0.5em;
 }
-.book-delete-warning img {
+.delete-warning img {
   filter: brightness(0%) invert(36%) sepia(88%) saturate(1527%) hue-rotate(327deg) brightness(98%) contrast(100%);
   width: 64px;
 }
-.book-delete-warning p {
+.delete-warning p {
   color: #40404A;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -1123,10 +1138,10 @@ body {
   max-width: 85%;
 }
 
-.book-delete-warning-buttons .button {
+.delete-warning-buttons .button {
   padding: 4px 18px;
   margin-right: 1em;
 }
-.book-delete-warning-buttons .button:last-child {
+.delete-warning-buttons .button:last-child {
   margin-right: 0;
 }

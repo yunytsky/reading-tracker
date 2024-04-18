@@ -63,9 +63,22 @@ body {
 
 .breadcrumbs{
   @include link-2;
-  color: $black-75;
   margin-bottom: 8px;
+}
+.breadcrumb{
+  color: $black-75;
   text-transform: capitalize;
+  &:hover{
+    color: $black;
+  }
+}
+
+.breadcrumb.last{
+  color: $black;
+  cursor: auto;
+}
+.breadcrumb.book-name{
+  text-transform: none;
 }
 
 .logo{

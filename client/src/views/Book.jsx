@@ -55,14 +55,15 @@ const Book = () => {
   const [finalBookAuthors, setFinalBookAuthors] = useState(null);
   const [finalBookAuthorsError, setFinalBookAuthorsError] = useState(false);
   const [colorDropdownVisible, setColorDropdownVisible] = useState({});
+  const colorDropdownRef = useRef(null);
   const [addNewAuthorInputVisible, setAddNewAuthorInputVisible] = useState(false);
   const [authorNameEditable, setAuthorNameEditable] = useState({});
   const [authorName, setAuthorName] = useState("");
   const [newAuthorName,setNewAuthorName] = useState("");
-  const colorDropdownRef = useRef(null);
   const authorsFormListRef = useRef(null);
+  const [deleteAuthorWarningVisible, setDeleteAuthorWarningVisible] = useState({});
+  const deleteAuthorWarningRef = useRef(null);
   //-------------------------------------------------
-
   //-------------------------------------------------
   //Genres form related states and refs
   const [genresFormVisible, setGenresFormVisible] = useState(false);
@@ -75,6 +76,8 @@ const Book = () => {
   const [genreName, setGenreName] = useState("");
   const [newGenreName,setNewGenreName] = useState("");
   const genresFormListRef = useRef(null);
+  const [deleteGenreWarningVisible, setDeleteGenreWarningVisible] = useState({});
+  const deleteGenreWarningRef = useRef(null);
   //-------------------------------------------------
 
   //-------------------------------------------------
@@ -93,62 +96,94 @@ const Book = () => {
         !statusDropdownButtonRef.current.contains(event.target)
       ) {
         setStatusDropdownVisible(false);
-      } else if (
+      } 
+       if (
         scoreDropdownRef.current !== null &&
         !scoreDropdownRef.current.contains(event.target) &&
         scoreDropdownButtonRef.current !== null &&
         !scoreDropdownButtonRef.current.contains(event.target)
       ) {
         setScoreDropdownVisible(false);
-      } else if (
+      } 
+       if (
         finishedReadingDropdownRef.current !== null &&
         !finishedReadingDropdownRef.current.contains(event.target) &&
         finishedReadingDropdownButtonRef.current !== null &&
         !finishedReadingDropdownButtonRef.current.contains(event.target)
       ) {
         setFinishedReadingDropdownVisible(false);
-      } else if (
+      } 
+       if (
         authorsFormRef.current != null &&
         !authorsFormRef.current.contains(event.target)
       ) {
         setAuthorsFormVisible(false);
-        if (colorDropdownVisible) {
-          setColorDropdownVisible(false);
-        }
-      } else if (
+      }
+       if (
         deleteBookWarningRef.current != null &&
         !deleteBookWarningRef.current.contains(event.target)
       ) {
         setDeleteBookWarningVisible(false);
-      } else if (
+      } 
+      
+      if (
+        deleteAuthorWarningRef.current != null &&
+        !deleteAuthorWarningRef.current.contains(event.target)
+      ) {
+        setDeleteAuthorWarningVisible({});
+      } 
+      
+      if (
+        deleteGenreWarningRef.current != null &&
+        !deleteGenreWarningRef.current.contains(event.target)
+      ) {
+        setDeleteGenreWarningVisible({});
+      }
+       if (
         genresFormRef.current !== null &&
         !genresFormRef.current.contains(event.target)
       ) {
         setGenresFormVisible(false);
-        if (colorDropdownVisible) {
-          setColorDropdownVisible(false);
-        }
-      } else if (
+      } 
+       if (
         colorDropdownRef.current !== null &&
-        !colorDropdownRef.current.contains(event.target) &&
-        authorsFormListRef.current !== null
+        !colorDropdownRef.current.contains(event.target)&&
+        (authorsFormListRef.current !== null || genresFormListRef.current !== null)
       ) {
         // Close all color dropdowns
         let buttonClicked = false;
-        const buttons = authorsFormListRef.current.querySelectorAll(
-          ".authors-form-author-change-color-button"
-        );
-        for (let i = 0; i < buttons.length; i++) {
-          const button = buttons[i];
-          if (button.contains(event.target)) {
+        if(authorsFormListRef.current !== null){
+          const authorsButtons = authorsFormListRef.current.querySelectorAll(
+            ".authors-form-author-change-color-button"
+          );
+                  
+          for (let i = 0; i < authorsButtons.length; i++) {
+            const button = authorsButtons[i];
+            if (button.contains(event.target)) {
             buttonClicked = true;
             break;
+            }
           }
+        }else if(genresFormListRef.current !== null){
+          const genresButtons = genresFormListRef.current.querySelectorAll(
+            ".genres-form-genre-change-color-button"
+          );
+  
+  
+          for (let i = 0; i < genresButtons.length; i++) {
+            const button = genresButtons[i];
+            if (button.contains(event.target)) {
+            buttonClicked = true;
+            break;
+            }
+          }
+  
         }
 
         if (!buttonClicked) {
           setColorDropdownVisible({});
         }
+
       }
     };
 
@@ -381,7 +416,6 @@ const Book = () => {
       console.log(error)
     }
   };
-  useEffect(() => {console.log(genreName)}, [genreName])
   
   const handleAddUserGenre = async () => {
     try {
@@ -538,7 +572,9 @@ const Book = () => {
 
   return (
     <div className="book">
-      <Breadcrumbs />
+      {bookData && bookData.book && (
+          <Breadcrumbs bookName={bookData.book.name}/>
+      )}
 
       {bookData && bookData.book && bookData.bookAuthors && (
         <>
@@ -701,186 +737,235 @@ const Book = () => {
                       );
 
                       return (
-                        <div
-                          className="authors-form-list-element"
-                          key={index}
-                          onClick={(e) => {
-                            handleAddBookAuthor(e, author);
-                          }}
-                        >
-                          <div className="authors-form-list-element-left">
-                            <button
-                              className="authors-form-author-rename-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (!deepEqual(authorNameEditable, {})) {
-                                  setAuthorNameEditable({});
-                                } else {
-                                  setNewAuthorName(author.name);
-                                  setAuthorNameEditable((prevEditable) => ({
-                                    [author.authorId]:
-                                      !prevEditable[author.authorId],
-                                  }));
-                                }
-                              }}
-                            >
-                              <img src={editIcon} alt="rename" />
-                            </button>
-                            {authorNameEditable[author.authorId] ? (
-                              <input
-                                className="authors-form-author-rename-input"
-                                autoFocus
-                                value={newAuthorName}
+                        <div key={index}>
+                          <div
+                            className="authors-form-list-element"
+                            onClick={(e) => {
+                              handleAddBookAuthor(e, author);
+                            }}
+                          >
+                            <div className="authors-form-list-element-left">
+                              <button
+                                className="authors-form-author-rename-button"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                }}
-                                onChange={(e) => {
-                                  setNewAuthorName(e.target.value);
-                                }}
-                                onBlur={() => {
-                                  if (
-                                    newAuthorName === author.name ||
-                                    newAuthorName === ""
-                                  ) {
+                                  if (!deepEqual(authorNameEditable, {})) {
                                     setAuthorNameEditable({});
-                                    return;
+                                  } else {
+                                    setNewAuthorName(author.name);
+                                    setAuthorNameEditable((prevEditable) => ({
+                                      [author.authorId]:
+                                        !prevEditable[author.authorId],
+                                    }));
                                   }
-                                  handleEditUserAuthor(
-                                    "name",
-                                    newAuthorName,
-                                    author.authorId
-                                  );
-                                }}
-                                type="text"
-                              />
-                            ) : (
-                              <div
-                                className="authors-form-author author small"
-                                style={{
-                                  backgroundColor: `#${authorColor.background}`,
-                                  color: `#${authorColor.foreground}`,
                                 }}
                               >
-                                {author.name}
-                              </div>
-                            )}
-                          </div>
-                          <div className="authors-form-list-element-right">
-                            <button
-                              className="authors-form-author-delete-button"
-                              onClick={(e) => {
-                                handleDeleteUserAuthor(e, author.authorId);
-                              }}
-                            >
-                              <img src={crossIcon} alt="delete" />
-                            </button>
-                            <button
-                              className="authors-form-author-change-color-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (!deepEqual(colorDropdownVisible, {})) {
-                                  setColorDropdownVisible({});
-                                } else {
-                                  setColorDropdownVisible((prevVisible) => ({
-                                    [author.authorId]:
-                                      !prevVisible[author.authorId],
-                                  }));
-                                }
-                              }}
-                            >
-                              <img src={dotsIcon} alt="color" />
-                            </button>
-
-                            {colorDropdownVisible[author.authorId] && (
-                              <div
+                                <img src={editIcon} alt="rename" />
+                              </button>
+                              {authorNameEditable[author.authorId] ? (
+                                <input
+                                  className="authors-form-author-rename-input"
+                                  autoFocus
+                                  value={newAuthorName}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                  }}
+                                  onChange={(e) => {
+                                    setNewAuthorName(e.target.value);
+                                  }}
+                                  onBlur={() => {
+                                    if (
+                                      newAuthorName === author.name ||
+                                      newAuthorName === ""
+                                    ) {
+                                      setAuthorNameEditable({});
+                                      return;
+                                    }
+                                    handleEditUserAuthor(
+                                      "name",
+                                      newAuthorName,
+                                      author.authorId
+                                    );
+                                  }}
+                                  type="text"
+                                />
+                              ) : (
+                                <div
+                                  className="authors-form-author author small"
+                                  style={{
+                                    backgroundColor: `#${authorColor.background}`,
+                                    color: `#${authorColor.foreground}`,
+                                  }}
+                                >
+                                  {author.name}
+                                </div>
+                              )}
+                            </div>
+                            <div className="authors-form-list-element-right">
+                              <button
+                                className="authors-form-author-delete-button"
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  if (!deepEqual(deleteAuthorWarningVisible, {})) {
+                                    setDeleteAuthorWarningVisible({});
+                                  } else {
+                                    setDeleteAuthorWarningVisible((prevVisible) => ({
+                                      [author.authorId]:
+                                        !prevVisible[author.authorId],
+                                    }));
+                                  }
                                 }}
-                                ref={colorDropdownRef}
-                                className="book-property-dropdown authors-form-dropdown color-dropdown"
                               >
-                                <h6>Choose color:</h6>
-                                <div className="color-dropdown-options">
-                                  {colorsData &&
-                                    colorsData.colors.map((color, index) => (
-                                      <div
-                                        className={author.color === color.name ? "color-dropdown-option selected" : "color-dropdown-option"}
-                                        key={index}
-                                        onClick={() => {
-                                          handleEditUserAuthor(
-                                            "color",
-                                            color.name,
-                                            author.authorId
-                                          );
-                                        }}
-                                      >
+                                <img src={crossIcon} alt="delete" />
+                              </button>
+                              <button
+                                className="authors-form-author-change-color-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!deepEqual(colorDropdownVisible, {})) {
+                                    setColorDropdownVisible({});
+                                  } else {
+                                    setColorDropdownVisible((prevVisible) => ({
+                                      [author.authorId]:
+                                        !prevVisible[author.authorId],
+                                    }));
+                                  }
+                                }}
+                              >
+                                <img src={dotsIcon} alt="color" />
+                              </button>
+                              {colorDropdownVisible[author.authorId] && (
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                  }}
+                                  ref={colorDropdownRef}
+                                  className="book-property-dropdown authors-form-dropdown color-dropdown"
+                                >
+                                  <h6>Choose color:</h6>
+                                  <div className="color-dropdown-options">
+                                    {colorsData &&
+                                      colorsData.colors.map((color, index) => (
                                         <div
-                                          className="color-dropdown-option-color"
-                                          style={{
-                                            backgroundColor: `#${color.foreground}`,
+                                          className={
+                                            author.color === color.name
+                                              ? "color-dropdown-option selected"
+                                              : "color-dropdown-option"
+                                          }
+                                          key={index}
+                                          onClick={() => {
+                                            handleEditUserAuthor(
+                                              "color",
+                                              color.name,
+                                              author.authorId
+                                            );
                                           }}
-                                        ></div>
-                                        <div className="color-dropdown-option-name">
-                                          {color.name}
+                                        >
+                                          <div
+                                            className="color-dropdown-option-color"
+                                            style={{
+                                              backgroundColor: `#${color.foreground}`,
+                                            }}
+                                          ></div>
+                                          <div className="color-dropdown-option-name">
+                                            {color.name}
+                                          </div>
                                         </div>
-                                      </div>
-                                    ))}
+                                      ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          
+                          </div>
+
+                          {deleteAuthorWarningVisible[author.authorId] && (
+                              <div
+                                className="delete-warning"
+                                ref={deleteAuthorWarningRef}
+                              >
+                                <img src={warningIcon} alt="warning" />
+                                <h4>Are you sure?</h4>
+                                <p>Do you really want to delete the author?</p>
+                                <div className="delete-warning-buttons">
+                                  <button
+                                    className="delete-warning-cancel-button button empty"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDeleteAuthorWarningVisible({});
+                                    }}
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    className="delete-warning-delete-button button red"
+                                    onClick={(e) => {
+                                      handleDeleteUserAuthor(
+                                        e,
+                                        author.authorId
+                                      );
+                                      setDeleteAuthorWarningVisible({});
+                                    }}
+                                  >
+                                    Delete
+                                  </button>
                                 </div>
                               </div>
                             )}
-                          </div>
                         </div>
+
                       );
                     })}
                 </div>
 
                 {/* Add author button*/}
-                {!addNewAuthorInputVisible && (
-                  <button
-                    className="authors-form-add-new-button"
-                    onClick={() => {
-                      setAddNewAuthorInputVisible(true);
-                    }}
-                  >
-                    <b>+</b> Add author
-                  </button>
-                )}
-                {addNewAuthorInputVisible && (
-                  <div className="authors-form-add-new">
-                    <input
-                      autoFocus
-                      type="text"
-                      className="authors-form-add-new-input"
-                      value={authorName}
-                      onChange={(e) => {
-                        setAuthorName(e.target.value);
-                      }}
-                    />
-                    <div className="authors-form-add-new-buttons">
-                      <button
-                        className="authors-form-add-new-button"
-                        onClick={() => {
-                          if (authorName == "") {
+                <div className="authors-form-add-new">
+                  {addNewAuthorInputVisible ? (
+                    <div className="authors-form-add-new editable">
+                      <input
+                        autoFocus
+                        type="text"
+                        className="authors-form-add-new-input"
+                        value={authorName}
+                        onChange={(e) => {
+                          setAuthorName(e.target.value);
+                        }}
+                      />
+                      <div className="authors-form-add-new-buttons">
+                        <button
+                          className="authors-form-add-new-button"
+                          onClick={() => {
+                            if (authorName == "") {
+                              setAddNewAuthorInputVisible(false);
+                              return;
+                            }
+                            handleAddUserAuthor();
+                          }}
+                        >
+                          Add
+                        </button>
+                        <button
+                          className="authors-form-add-new-button"
+                          onClick={() => {
+                            setAuthorName("");
                             setAddNewAuthorInputVisible(false);
-                            return;
-                          }
-                          handleAddUserAuthor();
-                        }}
-                      >
-                        Add
-                      </button>
-                      <button
-                        className="authors-form-add-new-button"
-                        onClick={() => {
-                          setAuthorName("");
-                          setAddNewAuthorInputVisible(false);
-                        }}
-                      >
-                        Cancel
-                      </button>
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <button
+                      className="authors-form-add-new-button"
+                      onClick={() => {
+                        setAddNewAuthorInputVisible(true);
+                      }}
+                    >
+                      <b>+</b> Add author
+                    </button>
+                  )}
+                </div>
 
                 {/* Save, cancel btns */}
                 <div className="authors-form-buttons">
@@ -980,134 +1065,173 @@ const Book = () => {
                       );
 
                       return (
-                        <div
-                          className="genres-form-list-element"
-                          key={index}
-                          onClick={(e) => {
-                            handleAddBookGenre(e, genre);
-                          }}
-                        >
-                          <div className="genres-form-list-element-left">
-                            <button
-                              className="genres-form-genre-rename-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (!deepEqual(genreNameEditable, {})) {
-                                  setGenreNameEditable({});
-                                } else {
-                                  setNewGenreName(genre.name);
-                                  setGenreNameEditable((prevEditable) => ({
-                                    [genre.genreId]:
-                                      !prevEditable[genre.genreId],
-                                  }));
-                                }
-                              }}
-                            >
-                              <img src={editIcon} alt="rename" />
-                            </button>
-                            {genreNameEditable[genre.genreId] ? (
-                              <input
-                                className="genres-form-genre-rename-input"
-                                autoFocus
-                                value={newGenreName}
+                        <div key={index}>
+                          <div
+                            className="genres-form-list-element"
+                            onClick={(e) => {
+                              handleAddBookGenre(e, genre);
+                            }}
+                          >
+                            <div className="genres-form-list-element-left">
+                              <button
+                                className="genres-form-genre-rename-button"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                }}
-                                onChange={(e) => {
-                                  setNewGenreName(e.target.value);
-                                }}
-                                onBlur={() => {
-                                  if (
-                                    newGenreName === genre.name ||
-                                    newGenreName === ""
-                                  ) {
+                                  if (!deepEqual(genreNameEditable, {})) {
                                     setGenreNameEditable({});
-                                    return;
+                                  } else {
+                                    setNewGenreName(genre.name);
+                                    setGenreNameEditable((prevEditable) => ({
+                                      [genre.genreId]:
+                                        !prevEditable[genre.genreId],
+                                    }));
                                   }
-                                  handleEditUserGenre(
-                                    "name",
-                                    newGenreName,
-                                    genre.genreId
-                                  );
-                                }}
-                                type="text"
-                              />
-                            ) : (
-                              <div
-                                className="genres-form-genre genre small"
-                                style={{
-                                  backgroundColor: `#${genreColor.background}`,
-                                  color: `#${genreColor.foreground}`,
                                 }}
                               >
-                                {genre.name}
-                              </div>
-                            )}
-                          </div>
-                          <div className="genres-form-list-element-right">
-                            <button
-                              className="genres-form-genre-delete-button"
-                              onClick={(e) => {
-                                handleDeleteUserGenre(e, genre.genreId);
-                              }}
-                            >
-                              <img src={crossIcon} alt="delete" />
-                            </button>
-                            <button
-                              className="genres-form-genre-change-color-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (!deepEqual(colorDropdownVisible, {})) {
-                                  setColorDropdownVisible({});
-                                } else {
-                                  setColorDropdownVisible((prevVisible) => ({
-                                    [genre.genreId]:
-                                      !prevVisible[genre.genreId],
-                                  }));
-                                }
-                              }}
-                            >
-                              <img src={dotsIcon} alt="color" />
-                            </button>
-
-                            {colorDropdownVisible[genre.genreId] && (
-                              <div
+                                <img src={editIcon} alt="rename" />
+                              </button>
+                              {genreNameEditable[genre.genreId] ? (
+                                <input
+                                  className="genres-form-genre-rename-input"
+                                  autoFocus
+                                  value={newGenreName}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                  }}
+                                  onChange={(e) => {
+                                    setNewGenreName(e.target.value);
+                                  }}
+                                  onBlur={() => {
+                                    if (
+                                      newGenreName === genre.name ||
+                                      newGenreName === ""
+                                    ) {
+                                      setGenreNameEditable({});
+                                      return;
+                                    }
+                                    handleEditUserGenre(
+                                      "name",
+                                      newGenreName,
+                                      genre.genreId
+                                    );
+                                  }}
+                                  type="text"
+                                />
+                              ) : (
+                                <div
+                                  className="genres-form-genre genre small"
+                                  style={{
+                                    backgroundColor: `#${genreColor.background}`,
+                                    color: `#${genreColor.foreground}`,
+                                  }}
+                                >
+                                  {genre.name}
+                                </div>
+                              )}
+                            </div>
+                            <div className="genres-form-list-element-right">
+                              <button
+                                className="genres-form-genre-delete-button"
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  if (!deepEqual(deleteGenreWarningVisible, {})) {
+                                    setDeleteGenreWarningVisible({});
+                                  } else {
+                                    setDeleteGenreWarningVisible((prevVisible) => ({
+                                      [genre.genreId]:
+                                        !prevVisible[genre.genreId],
+                                    }));
+                                  }
                                 }}
-                                ref={colorDropdownRef}
-                                className="book-property-dropdown genres-form-dropdown color-dropdown"
                               >
-                                <h6>Choose color:</h6>
-                                <div className="color-dropdown-options">
-                                  {colorsData &&
-                                    colorsData.colors.map((color, index) => (
-                                      <div
-                                      className={genre.color === color.name ? "color-dropdown-option selected" : "color-dropdown-option"}
-                                        key={index}
-                                        onClick={() => {
-                                          handleEditUserGenre(
-                                            "color",
-                                            color.name,
-                                            genre.genreId
-                                          );
-                                        }}
-                                      >
+                                <img src={crossIcon} alt="delete" />
+                              </button>
+                              <button
+                                className="genres-form-genre-change-color-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!deepEqual(colorDropdownVisible, {})) {
+                                    setColorDropdownVisible({});
+                                  } else {
+                                    setColorDropdownVisible((prevVisible) => ({
+                                      [genre.genreId]:
+                                        !prevVisible[genre.genreId],
+                                    }));
+                                  }
+                                }}
+                              >
+                                <img src={dotsIcon} alt="color" />
+                              </button>
+                              {colorDropdownVisible[genre.genreId] && (
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                  }}
+                                  ref={colorDropdownRef}
+                                  className="book-property-dropdown genres-form-dropdown color-dropdown"
+                                >
+                                  <h6>Choose color:</h6>
+                                  <div className="color-dropdown-options">
+                                    {colorsData &&
+                                      colorsData.colors.map((color, index) => (
                                         <div
-                                          className="color-dropdown-option-color"
-                                          style={{
-                                            backgroundColor: `#${color.foreground}`,
+                                        className={genre.color === color.name ? "color-dropdown-option selected" : "color-dropdown-option"}
+                                          key={index}
+                                          onClick={() => {
+                                            handleEditUserGenre(
+                                              "color",
+                                              color.name,
+                                              genre.genreId
+                                            );
                                           }}
-                                        ></div>
-                                        <div className="color-dropdown-option-name">
-                                          {color.name}
+                                        >
+                                          <div
+                                            className="color-dropdown-option-color"
+                                            style={{
+                                              backgroundColor: `#${color.foreground}`,
+                                            }}
+                                          ></div>
+                                          <div className="color-dropdown-option-name">
+                                            {color.name}
+                                          </div>
                                         </div>
-                                      </div>
-                                    ))}
+                                      ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {deleteGenreWarningVisible[genre.genreId] && (
+                              <div
+                                className="delete-warning"
+                                ref={deleteGenreWarningRef}
+                              >
+                                <img src={warningIcon} alt="warning" />
+                                <h4>Are you sure?</h4>
+                                <p>Do you really want to delete the genre?</p>
+                                <div className="delete-warning-buttons">
+                                  <button
+                                    className="delete-warning-cancel-button button empty"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDeleteGenreWarningVisible({});
+                                    }}
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    className="delete-warning-delete-button button red"
+                                    onClick={(e) => {
+                                      handleDeleteUserGenre(e, genre.genreId);
+                                      setDeleteGenreWarningVisible({});
+                                    }}
+                                  >
+                                    Delete
+                                  </button>
                                 </div>
                               </div>
                             )}
-                          </div>
                         </div>
                       );
                     })}
@@ -1351,13 +1475,13 @@ const Book = () => {
       </button>
 
       {deleteBookWarningVisible && (
-        <div className="book-delete-warning" ref={deleteBookWarningRef}>
+        <div className="delete-warning" ref={deleteBookWarningRef}>
           <img src={warningIcon} alt="warning" />
           <h4>Are you sure?</h4>
           <p>Do you really want to delete the book? This process cannot be undone</p>
-          <div className="book-delete-warning-buttons">
-            <button className="book-delete-warning-cancel-button button empty" onClick={() => {toggleDropdownOrForm(setDeleteBookWarningVisible)}} >Cancel</button>
-            <button className="book-delete-warning-delete-button button red" onClick={handleDelete}>Delete</button>
+          <div className="delete-warning-buttons">
+            <button className="delete-warning-cancel-button button empty" onClick={() => {toggleDropdownOrForm(setDeleteBookWarningVisible)}} >Cancel</button>
+            <button className="delete-warning-delete-button button red" onClick={handleDelete}>Delete</button>
           </div>
         </div>
       )}
