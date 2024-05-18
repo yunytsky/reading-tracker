@@ -55,3 +55,18 @@
          background-color: darken($color: $red, $amount: 5%); 
      }
 }
+
+.delete-button{
+    @include button-2;
+    color: $red;
+    border: 1px solid $red;
+    border-radius: 100px;
+    padding: 8px 32px;
+    &:hover, &:focus{
+        color: darken($color: $red, $amount: 20%);
+        border: 1px solid darken($color: $red, $amount: 30%);
+    }
+    &:active{
+        background-color: lighten($color: $red, $amount: 36%);
+    }
+  }

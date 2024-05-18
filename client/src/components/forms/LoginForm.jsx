@@ -1,12 +1,15 @@
 import { loginSchema } from "../../schemas";
 import {useFormik} from "formik";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api";
+import { AuthContext } from "../../context/AuthContext";
 
 const LoginForm = () => {
     const [submitError, setSubmitError] = useState({error: false, message: ""});
     const navigate = useNavigate();
+    const {setUser} = useContext(AuthContext);
+
     const onSubmit = async (values, actions) => {
       try {        
         if(submitError){
@@ -18,13 +21,12 @@ const LoginForm = () => {
         const res = await login(values, config);
 
         localStorage.setItem("user", JSON.stringify(res.data.user));
+        setUser(res.data.user);
 
         actions.resetForm();
         navigate("/library");
 
       } catch (error) {
-        console.log("ERRPR CATCHED")
-        console.log("E",error)
         if(error.response && error.response.data.message){
           setSubmitError({error: true, message: error.response.data.message})
         }else{

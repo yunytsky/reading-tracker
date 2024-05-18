@@ -1,6 +1,6 @@
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 import { createAuthor, createGenre, deleteAuthor, deleteBook, deleteGenre, editAuthor, editBook, editBookAuthors, editBookGenres, editGenre, getBook, getColors, getUserAuthors, getUserGenres } from "../api";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { deepEqual } from "../utils";
 import Breadcrumbs from "../components/Breadcrumbs";
 
@@ -9,11 +9,13 @@ import dotsIcon from "../assets/dots.svg";
 import editIcon from "../assets/edit.svg";
 import crossIcon from "../assets/cross.svg";
 import warningIcon from "../assets/warning.svg";
+import { AuthContext } from "../context/AuthContext";
 
 
 const Book = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const {user} = useContext(AuthContext);
 
   const { bookData, colorsData } = useLoaderData();
   //-------------------------------------------------
@@ -260,7 +262,7 @@ const Book = () => {
       if (authorsFormVisible && !userAuthors) {
         try {
           const config = { withCredentials: true };
-          const res = await getUserAuthors(config);
+          const res = await getUserAuthors(config, user.userId);
           setUserAuthors(res.data.authors);
         } catch (error) {
           console.log(error);
@@ -279,7 +281,7 @@ const Book = () => {
       if (genresFormVisible && !userGenres) {
         try {
           const config = { withCredentials: true };
-          const res = await getUserGenres(config);
+          const res = await getUserGenres(config, user.userId);
           setUserGenres(res.data.genres);
         } catch (error) {
           console.log(error);
@@ -297,7 +299,7 @@ const Book = () => {
     try {
       const config = { withCredentials: true };
       const bookId = params.bookId;
-      const res = await editBook(data, config, bookId);
+      const res = await editBook(data, config, bookId, user.userId);
       window.location.reload();
     } catch (error) {
       console.log(error);
@@ -308,7 +310,7 @@ const Book = () => {
       try {
         const config = { withCredentials: true };
         const bookId = params.bookId;
-        const res = await deleteBook(config, bookId);
+        const res = await deleteBook(config, bookId, user.userId);
         navigate("/library");
       } catch (error) {
         console.log(error);
@@ -368,11 +370,11 @@ const Book = () => {
     e.stopPropagation();
     try {
       const config = { withCredentials: true };
-      const res = await deleteAuthor(config, authorId);
+      const res = await deleteAuthor(config, authorId, user.userId);
       if(!res){
         throw new error;
       }
-      const resAuthors = await getUserAuthors(config);
+      const resAuthors = await getUserAuthors(config, user.userId);
       setUserAuthors(resAuthors.data.authors);
       const updatedBookAuthors = bookData.bookAuthors.filter(author => author.authorId !== authorId);
       bookData.bookAuthors = updatedBookAuthors;
@@ -388,11 +390,11 @@ const Book = () => {
     e.stopPropagation();
     try {
       const config = { withCredentials: true };
-      const res = await deleteGenre(config, genreId);
+      const res = await deleteGenre(config, genreId, user.userId);
       if(!res){
         throw new error;
       }
-      const resGenres = await getUserGenres(config);
+      const resGenres = await getUserGenres(config, user.userId);
       setUserGenres(resGenres.data.genres);
       const updatedBookGenres = bookData.bookGenres.filter(genre => genre.genreId !== genreId);
       bookData.bookGenres = updatedBookGenres;
@@ -407,8 +409,8 @@ const Book = () => {
     try {
       const config = {withCredentials: true};
       const data = {name: authorName};
-      await createAuthor(data, config);
-      const res = await getUserAuthors(config);
+      await createAuthor(data, config, user.userId);
+      const res = await getUserAuthors(config, user.userId);
       setUserAuthors(res.data.authors);
       setAuthorName("");
       setAddNewAuthorInputVisible(false);
@@ -421,8 +423,8 @@ const Book = () => {
     try {
       const config = {withCredentials: true};
       const data = {name: genreName};
-      await createGenre(data, config);
-      const res = await getUserGenres(config);
+      await createGenre(data, config, user.userId);
+      const res = await getUserGenres(config, user.userId);
       setUserGenres(res.data.genres);
       setGenreName("");
       setAddNewGenreInputVisible(false);
@@ -435,9 +437,9 @@ const Book = () => {
     try {
       const config = {withCredentials: true};
       const data = {column: column, value: value};
-      await editAuthor(data, config, authorId)
+      await editAuthor(data, config, authorId, user.userId)
 
-      const res = await getUserAuthors(config);
+      const res = await getUserAuthors(config, user.userId);
       setUserAuthors(res.data.authors);
 
       if(column === "color"){
@@ -473,9 +475,9 @@ const Book = () => {
     try {
       const config = {withCredentials: true};
       const data = {column: column, value: value};
-      await editGenre(data, config, genreId);
+      await editGenre(data, config, genreId, user.userId);
 
-      const res = await getUserGenres(config);
+      const res = await getUserGenres(config, user.userId);
       setUserGenres(res.data.genres);
 
       if(column === "color"){
@@ -527,7 +529,7 @@ const Book = () => {
       }
     
       if(authorsModified){
-        const res = await editBookAuthors({bookAuthors: finalBookAuthors}, config, bookId);
+        const res = await editBookAuthors({bookAuthors: finalBookAuthors}, config, bookId, user.userId);
         window.location.reload();
       }else{
         toggleDropdownOrForm(setAuthorsFormVisible);
@@ -558,7 +560,7 @@ const Book = () => {
       }
     
       if(genresModified){
-        const res = await editBookGenres({bookGenres: finalBookGenres}, config, bookId);
+        const res = await editBookGenres({bookGenres: finalBookGenres}, config, bookId, user.userId);
         window.location.reload();
       }else{
         toggleDropdownOrForm(setGenresFormVisible);
@@ -1498,7 +1500,7 @@ export const bookLoader = async ({params}) => {
     try {
         const config = {withCredentials: true}; 
         const bookId = params.bookId;
-        const bookRes = await getBook(config, bookId);
+        const bookRes = await getBook(config, bookId, user.userId);
         const colorsRes = await getColors();
 
         return {bookData: bookRes.data, colorsData: colorsRes.data};

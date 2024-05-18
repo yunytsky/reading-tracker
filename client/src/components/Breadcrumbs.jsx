@@ -6,14 +6,13 @@ const Breadcrumbs = ({bookName}) => {
     const params = useParams();
     const [breadcrumbs, setBreadcrumbs] = useState([]);
     
-    useEffect(() => {console.log("BRC", breadcrumbs)}, [breadcrumbs])
     useEffect(() => {
         if(params.bookId && bookName){
             const crumbs = location.pathname.split("/").filter(crumb => crumb != "").slice(0, -2)
             crumbs.push(bookName);
             const crumbsElements = crumbs.map((crumb, index) => (
               index === crumbs.length - 1 ? (
-                <span className="breadcrumb last book-name">{crumb}</span>
+                <span key={index} className="breadcrumb last book-name">{crumb}</span>
               ) : (
                 <Link to={`/${crumb}`} className="breadcrumb" key={index}>
                   {crumb}/
@@ -26,7 +25,7 @@ const Breadcrumbs = ({bookName}) => {
             const crumbs = location.pathname.split("/").filter(breadcrumb => breadcrumb != "");
             const crumbsElements = crumbs.map((crumb, index) => (
                 index === crumbs.length - 1 ? (
-                    <span className="breadcrumb last">{crumb}</span>
+                    <span key={index} className="breadcrumb last">{crumb}</span>
                   ) : (
                     <Link to={`/${crumb}`} className="breadcrumb" key={index}>
                       {crumb}/
@@ -37,14 +36,6 @@ const Breadcrumbs = ({bookName}) => {
         }
 
     }, [])
-
-    let currentLink = ""
-
-    const crumbs = location.pathname.split('/')
-    .filter(crumb => crumb !== "")
-
-    
-    
 
     return(
         <div className="breadcrumbs">

@@ -16,6 +16,7 @@ $white: #fff;
 $primary: #007BD0;
 //Secondary
 $red: #F9455A;
+$green: #20bf6b;
 
 //Shadows
 $shadow-main: rgba(33, 35, 38, 0.1) 0px 10px 10px -10px;
@@ -23,4 +24,6 @@ $shadow-main: rgba(33, 35, 38, 0.1) 0px 10px 10px -10px;
 //SVG
 $black-50-svg: brightness(0%) invert(55%) sepia(6%) saturate(277%) hue-rotate(202deg) brightness(90%) contrast(88%);
 $black-75-svg: brightness(0%) invert(25%) sepia(7%) saturate(861%) hue-rotate(202deg) brightness(87%) contrast(89%);
+$black-svg: brightness(0%) invert(2%) sepia(69%) saturate(2473%) hue-rotate(254deg) brightness(120%) contrast(114%);
 $red-svg: brightness(0%) invert(36%) sepia(88%) saturate(1527%) hue-rotate(327deg) brightness(98%) contrast(100%);
+$primary-svg: brightness(0%) invert(30%) sepia(81%) saturate(1549%) hue-rotate(183deg) brightness(99%) contrast(101%);

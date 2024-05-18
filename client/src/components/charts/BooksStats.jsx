@@ -1,16 +1,19 @@
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS } from "chart.js/auto";
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { getBooks } from '../../api';
 import { useOutletContext } from 'react-router-dom';
 import { arraysEqual } from '../../utils';
+import { AuthContext } from '../../context/AuthContext';
+
+
 
 const BooksStats = () => {
     const [allYears, selectedYears] = useOutletContext();
     const [labels, setLabels] = useState([]);
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
- 
+    const {user} = useContext(AuthContext);
     const options = {
         responsive: true,
         scales: {
@@ -49,7 +52,7 @@ const BooksStats = () => {
                 }
 
                 const config = {withCredentials: true};
-                const res = await getBooks(config, queryString);
+                const res = await getBooks(config, user.userId,queryString);
 
                 const finishedBooks = res.data.books.filter(book => book.status === "finished");
 
@@ -72,7 +75,6 @@ const BooksStats = () => {
         fetchData();
     }, [selectedYears])
 
-
     const chartData = {
     labels,
     datasets: [
@@ -85,9 +87,11 @@ const BooksStats = () => {
   };
   
   return (
-    <div className="chart bar-chart">
-     <Bar options={options} data={chartData} />
-    </div>
+    <>
+    {data.length > 0 ? (<div className='chart bar-chart'>
+    <Bar options={options} data={chartData} />
+    </div>) : (<div className="data-empty">No finished books</div>)}
+  </>
   );
 };
 

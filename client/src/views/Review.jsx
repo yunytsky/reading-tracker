@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Breadcrumbs from "../components/Breadcrumbs";
 import { NavLink, Outlet, useLoaderData, useLocation, useNavigate } from "react-router-dom";
 import arrowIcon from "../assets/arrow.svg";
-import { getBooks, getYearRange } from "../api";
+import { getYearRange } from "../api";
+import { AuthContext } from "../context/AuthContext";
 
 const Review = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Review = () => {
   const yearFilterDropdownRef = useRef(null);
   const [allYears, setAllYears] = useState([]);
   const [selectedYears, setSelectedYears] = useState([]);
+  const {user} = useContext(AuthContext);
 
   //Navigate to the book-stats if no tab is chosen
   useEffect(() => {
@@ -45,7 +47,7 @@ const Review = () => {
       try {
         //Set years
         const config = {withCredentials: true};
-        const yearsRes = await getYearRange(config);
+        const yearsRes = await getYearRange(config, user.userId);
         
         setAllYears(yearsRes.data.yearRange);
         setSelectedYears(yearsRes.data.yearRange);

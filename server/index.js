@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import usersRoutes from "./routes/users.js";
 import cookieParser from "cookie-parser";
-import { getColors } from "./database/functions.js";
+import { getColors, getAvatars } from "./database/functions.js";
 
 // Configurations
 const app = express();  
@@ -21,6 +21,14 @@ app.get("/colors", async (req, res) => {
     try {
         const [colors] = await getColors();
         return res.status(200).json({error: false, message: "Succes", colors: colors});
+    } catch (error) {
+        return res.status(500).json({error: true, message: error.message});
+    }
+});
+app.get("/avatars", async (req, res) => {
+    try {
+        const [avatars] = await getAvatars();
+        return res.status(200).json({error: false, message: "Succes", avatars: avatars});
     } catch (error) {
         return res.status(500).json({error: true, message: error.message});
     }

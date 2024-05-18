@@ -1,14 +1,16 @@
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS } from "chart.js/auto";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getBooks, getBooksGenres, getColors, getUserGenres } from "../../api";
 import uniqolor from "uniqolor";
 import randomColor from "randomcolor";
 import { useOutletContext } from "react-router-dom";
 import { arraysEqual } from "../../utils";
+import { AuthContext } from "../../context/AuthContext";
 
 const GenreStats = () => {
   const [allYears, selectedYears] = useOutletContext();
+  const {user} = useContext(AuthContext);
 
   const options = {
     responsive: true,
@@ -48,9 +50,9 @@ const GenreStats = () => {
         }
 
         const [resUserGenres, resBooks, resBooksGenres, resColors] = await Promise.all([
-          getUserGenres(config),
-          getBooks(config, queryString),
-          getBooksGenres(config),
+          getUserGenres(config,  user.userId),
+          getBooks(config, user.userId, queryString),
+          getBooksGenres(config, user.userId),
           getColors()
         ]);
 
@@ -113,10 +115,18 @@ const GenreStats = () => {
 
 
   return (
-    <div className="chart doughnut-chart">
-      <Doughnut options={options} data={chartData} />
-    </div>
+    <>
+      {data.length > 0 ? (
+        <div className="chart doughnut-chart">
+          <Doughnut options={options} data={chartData} />
+        </div>
+      ) : (
+        <div className="data-empty">No finished books</div>
+      )}
+    </>
   );
+
+  
 };
 
 export default GenreStats;

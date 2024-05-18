@@ -44,7 +44,7 @@ const LibraryToolbar = ({
       const config = { withCredentials: true };
       const data = { name: bookName };
 
-      const res = await addBook(data, config);
+      const res = await addBook(data, config, user.userId);
       setAddBookFormVisible(false);
 
       navigate(`/library/book/${res.data.book}`);
@@ -184,6 +184,11 @@ const LibraryToolbar = ({
                       </label>
                     ))
                     .reverse()}
+                {allYears.length === 0 && (
+                  <div className="filter-dropdown-empty-option">
+                    No finished books
+                  </div>
+                )}
               </div>
 
               <div className="filter-dropdown-actions">
@@ -343,25 +348,24 @@ const LibraryToolbar = ({
 
           <div className="add-book-form-buttons">
             <button
-            type="button"
-            className="button empty"
-            onClick={() => {
-              setAddBookFormVisible(prevVisible => !prevVisible)
-            }}
-          >
-            Cancel
+              type="button"
+              className="button empty"
+              onClick={() => {
+                setAddBookFormVisible((prevVisible) => !prevVisible);
+              }}
+            >
+              Cancel
             </button>
             <button
-                type="submit"
-                className="button"
-                onClick={(e) => {
-                  handleAddBook(e);
-                }}
-              >
-                Add
-              </button>
+              type="submit"
+              className="button"
+              onClick={(e) => {
+                handleAddBook(e);
+              }}
+            >
+              Add
+            </button>
           </div>
-
         </form>
       )}
 

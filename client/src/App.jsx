@@ -9,18 +9,26 @@ import Profile from "./views/Profile";
 import Review from "./views/Review";
 import BooksStats from "./components/charts/BooksStats";
 import GenreStats from "./components/charts/GenreStats";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Main from "./views/Main";
+import Verification from "./views/Verification";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<AppLayout/>}>
+      <Route index element={<Main/>}/>
       <Route path="login" element={<Login/>}/>
       <Route path="signup" element={<Signup/>}/>
-      <Route path="library" element={<Library/>}/>
-      <Route path="library/book/:bookId" element={<Book/>} loader={bookLoader}/>
-      <Route path="profile" element={<Profile/>} />
-      <Route path="review" element={<Review/>} >
-        <Route path="books-stats" element={<BooksStats/>}/>
-        <Route path="genre-stats" element={<GenreStats/>}/>
+      <Route path="verification" element={<Verification/>}/>
+
+      <Route element={<ProtectedRoute/>}>
+        <Route path="library" element={<Library/>}/>
+        <Route path="library/book/:bookId" element={<Book/>} loader={bookLoader}/>
+        <Route path="profile" element={<Profile/>} />
+        <Route path="review" element={<Review/>} >
+          <Route path="books-stats" element={<BooksStats/>}/>
+          <Route path="genre-stats" element={<GenreStats/>}/>
+        </Route>
       </Route>
     </Route>
   )

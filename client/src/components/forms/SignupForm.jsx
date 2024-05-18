@@ -1,16 +1,64 @@
 import { signupSchema } from "../../schemas";
 import {useFormik} from "formik";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
+import { signup } from "../../api";
+import axios from "axios";
 const SignupForm = () => {
-    const onSubmit = () => {
-        console.log("signup req")
+  const [submitError, setSubmitError] = useState({error: false, message: ""});
+  const [countries, setCountries] = useState([]);
+
+  // Fetch countries
+    useEffect(() => {
+      const fetchData = async () => {
+        const res = await axios.get("https://restcountries.com/v3.1/all?fields=name,flags");
+        const countries = res.data.map((country, index) => {return({name: country.name.common, code: index})})
+
+        countries.sort((a, b) => {
+          const nameA = a.name.toLowerCase();
+          const nameB = b.name.toLowerCase(); 
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+
+          return 0;
+        });
+
+        setCountries(countries);
+      }
+
+      fetchData();
+    }, [])
+
+    const onSubmit = async (values, actions) => {
+        try {
+          if(submitError){
+            setSubmitError({error: false, message: ""});
+          }
+
+          const config = {withCredentials: true}
+          const res = await signup(values, config);
+         
+          actions.resetForm();
+
+        } catch (error) {
+          
+          if(error.response && error.response.data.message){
+            setSubmitError({error: true, message: error.response.data.message})
+          }else{
+            setSubmitError({error: true, message: "Error"})
+          }
+        }
     }
 
     const formik = useFormik({
         initialValues: {
             email: "",
             username: "",
+            country: "",
             password: "",
             passwordConfirmation: ""
         },
@@ -51,6 +99,17 @@ const SignupForm = () => {
           <span className="form-error">{formik.errors.username}</span>
         )}
 
+        {/* Country */}
+        <label className="form-label" htmlFor="country">Country</label>
+        <select className="form-select" name="country" id="country" onChange={formik.handleChange} value={formik.values.country}>
+          <option value=""></option>
+          {countries.map((country, index) => (<option key={country.code} value={country.code}>{country.name}</option>))}
+        </select>
+
+        {formik.errors.country && formik.touched.country && (
+          <span className="form-error">{formik.errors.country}</span>
+        )}
+
         {/* Password */}
         <label className="form-label" htmlFor="password">Password</label>
         <input
@@ -67,12 +126,12 @@ const SignupForm = () => {
         )}
 
         {/* Password confirmation */}
-        <label className="form-label" htmlFor="password-confirmation">Password confirmation</label>
+        <label className="form-label" htmlFor="passwordConfirmation">Password confirmation</label>
         <input
           type="password"
           className="form-input"
-          name="password-confirmation"
-          id="password-confirmation"
+          name="passwordConfirmation"
+          id="passwordConfirmation"
           value={formik.values.passwordConfirmation}
           onChange={formik.handleChange}
         />
@@ -87,7 +146,7 @@ const SignupForm = () => {
         </button>
 
         {/* Submit error */}
-        {/* submit err */}
+        {submitError.error && <span className="form-submit-error">{submitError.message}</span>}
 
         {/* Auxiliary link */}
         <span className="form-auxiliary-link">

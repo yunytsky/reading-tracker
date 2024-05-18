@@ -14,11 +14,43 @@ export function findByEmail(email) {
     `,[email]);
 }
 
+export function findById(userId) {
+    return pool.execute(`
+        SELECT * FROM users
+        WHERE userId = ?
+    `, [userId]);
+}
+
 export  function createUser(email, username, country, password) {
     return pool.execute(`
         INSERT INTO users (email, username, country, password) 
         VALUES (?, ?, ?, ?)
     `, [email, username, country, password]);
+}
+
+export function changeUserPassword(password, userId) {
+    return pool.execute(`
+    UPDATE users
+    SET password = ?
+    WHERE userId = ?
+`, [password, userId]);
+}
+
+
+export function changeUserCountry(country, userId) {
+    return pool.execute(`
+    UPDATE users
+    SET country = ?
+    WHERE userId = ?
+`, [country, userId]);
+}
+
+export function changeUserAvatar(avatarId, userId) {
+    return pool.execute(`
+    UPDATE users
+    SET avatarId = ?
+    WHERE userId = ?
+`, [avatarId, userId]);    
 }
 
 export function getUserAuthors(userId) {
@@ -281,6 +313,12 @@ export function deleteBookEntry(bookId) {
 export function getColors() {
     return pool.execute(`
         SELECT * FROM colors;
+    `);
+}
+
+export function getAvatars() {
+    return pool.execute(`
+        SELECT * FROM avatars;
     `);
 }
 

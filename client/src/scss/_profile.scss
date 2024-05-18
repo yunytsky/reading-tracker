@@ -1,0 +1,177 @@
+.profile{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-avatar{
+    margin-bottom: .5em;
+    position: relative;
+
+    .avatar{
+        width: 8em;
+        cursor: pointer;
+        display: block;
+        &:hover{
+            filter: brightness(0.8);
+        }
+    }
+    &::after{
+        cursor: pointer;
+        content: "";
+        background-image: url("./assets/pencil.svg");
+        background-repeat: no-repeat;
+        background-size: 10px 10px;
+        background-position: 50%;
+
+        width: 26px;
+        height: 26px;
+        border-radius: 100%;
+        background-color: $primary;
+        position: absolute;
+        bottom: 5px;
+        right: 0;
+        z-index: 999;
+    }
+
+}
+
+.profile-user{
+    display: flex;
+    align-items: center;
+    margin-bottom: 2em !important;
+    .username{
+        margin-right: .35em;
+
+    }
+    .flag{
+        width: .75em;
+    }
+}
+
+.profile-info{
+    display: flex;
+    flex-direction: column;
+    h5{
+        @include medium;
+        text-transform: capitalize;
+        margin-bottom: 1.5em;
+    }
+}
+
+.profile-input-label{
+    @include body-2;
+    margin-bottom: .25em;
+    display: block;
+}
+.profile-input, .profile-select{
+    width: 25em;
+    border: 1px solid $black-10;
+    border-radius: 4px;
+    padding: .65em;
+    margin-bottom: 1.5em;
+    color: $black-75;
+    &:hover{
+        border: 1px solid $black-25;
+    }
+    &:focus{
+        border: 1px solid $primary;
+    }
+    &:active{
+        border: 1px solid $primary;
+    }
+    &:disabled{
+        background-color: $black-5;
+        border: 1px solid $black-10;
+    }
+}
+
+.profile-delete-button{
+    align-self: start;
+    margin-top: 2em;
+
+}
+
+.profile-save-button{
+    align-self: start;
+    border-radius: 100px;
+    padding: 8px 32px;
+    @include button-2;
+    margin-bottom: 1.5em;
+}
+
+.profile-info-error{
+    color: $red;
+    @include body-3;
+    margin-top: -1.5em;
+    margin: -1.5em 0 1.5em 0;
+}
+
+.profile-info-submit-error{
+    color: $red;
+    @include body-2;
+    margin: -.75em 0 .5em 0;
+}
+
+
+.profile-info-password-updated-message{
+    @include body-2;
+    color: $green;
+    margin: -1.25em 0 1em 0;
+}
+
+.profile-avatars-form{
+    display: flex;
+    flex-direction: column;
+    background-color: $white;
+    position: absolute;
+    border-radius: 4px;
+    padding: 2em 1em;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    border: 1px solid $black-10;
+    padding: 1em 0;
+    h5{
+        @include medium;
+        margin-bottom: 1em;
+        text-align: center;
+    }
+}
+
+.profile-avatars-form-avatars{
+    padding: 16px 1.5em 8px 1.5em;
+    border-bottom: 1px solid $black-10;
+    border-top: 1px solid $black-10;
+    margin-bottom: 1em;
+    display: grid;
+    grid-template-columns: 112px 112px 96px;
+    .avatar{
+        width: 96px;
+        margin-bottom: 8px;
+        border-radius: 100%;
+        cursor: pointer;
+        &:hover{
+            filter: brightness(0.8);
+        }
+    }
+
+    .avatar.selected{
+        border: 3px solid $primary;
+    }
+}
+
+.profile-avatars-form-buttons{
+    
+    text-align: center;
+    .button{
+        @include button-2;
+        margin: 0 auto;
+        padding: 6px 24px;
+        margin-right: .5em;
+        &:last-child{
+            margin-right: 0;
+        }
+    }
+}

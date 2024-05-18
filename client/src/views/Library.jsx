@@ -3,10 +3,13 @@ import { getBooks, getColors, getYearRange } from "../api";
 import {useLoaderData} from "react-router-dom";
 import LibraryToolbar from "../components/LibraryToolbar";
 import Breadcrumbs from "../components/Breadcrumbs";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { arraysEqual } from "../utils";
+import { AuthContext } from "../context/AuthContext";
 
 const Library = () => {
+  const {user} = useContext(AuthContext);
+
   const [books, setBooks] = useState([]);
   const [colors, setColors] = useState([]);
   const [allYears, setAllYears] = useState([]);
@@ -19,7 +22,7 @@ const Library = () => {
     const fetchData = async () => {
       try {
         const config = {withCredentials: true};
-        const yearsRes = await getYearRange(config);
+        const yearsRes = await getYearRange(config, user.userId);
 
         setAllYears(yearsRes.data.yearRange);
         setSelectedYears(yearsRes.data.yearRange);
@@ -60,7 +63,8 @@ const Library = () => {
           queryString += `&status=${selectedStatuses.join("%2C%20")}`
         }
 
-        const booksRes = await getBooks(config, queryString);
+        const booksRes = await getBooks(config, user.userId, queryString);
+
         setBooks(booksRes.data.books);
 
       } catch (error) {
@@ -109,6 +113,8 @@ const Library = () => {
                 colors={colors}
               />
             ))}
+        
+        {books.length === 0 && (<div className="data-empty">No books. Click an Add button to create an entry</div>)}
       </div>
     </div>
   );
