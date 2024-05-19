@@ -77,11 +77,19 @@ export async function sendCode(receiver, type) {
              from: process.env.SMTP_USER,
              to: receiver,
              subject: "LitLog - password reset",
-             text: `Code for restoring password: ${code}`,
+             text: `Code for resetting password: ${code}`,
              html: `<div>Code will expire in 2 hours<br/>If you have not attempted to change your password, ignore this message</div><br/><h1>${code}</h1>`
           }
-       }
- 
+       }else if(type === "email-change") {
+        options = {
+           from: process.env.SMTP_USER,
+           to: receiver,
+           subject: "LitLog - changing email",
+           text: `Code for changing email: ${code}`,
+           html: `<div>Code will expire in 2 hours<br/>If you have not attempted to change your email, ignore this message</div><br/><h1>${code}</h1>`
+        }
+     }
+
         const info = await transporter.sendMail(options);
 
         //Check if such a verification instance already exists

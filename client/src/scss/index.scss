@@ -113,6 +113,17 @@ body {
   }
 }
 
+.error-page{
+  h1{
+    color: $red;
+  }
+  text-align: center;
+  padding: 4em 1em;
+  p{
+    color: $black-75;
+  }
+}
+
 .header{
   display: flex;
   align-items: center;
@@ -251,6 +262,14 @@ body {
   }
 }
 
+.new-password-form-updated-message{
+  @include body-2;
+  text-align: center;
+  color: $green;
+  margin: -1.25em 0 1em 0;
+}
+
+
 .reset-password-initial{
   padding-top: 5em;
 }
@@ -273,7 +292,17 @@ body {
     width: 16em;
   }
 }
-
+.verification-buttons{
+  display: flex;
+  .button{
+    @include button-2;
+    padding: 6px 24px;
+    margin-right:.75em;
+    &:last-child{
+      margin-right: 0;
+    }
+  }
+}
 .verification-verify-button{
   @include button-1;
   padding: 6px 24px;

@@ -39,12 +39,28 @@ export const logout = (config) => {
   return instance.post(`/auth/log-out`, {}, config);
 };
 
+export const changeUserPassword = (data, config) => {
+  return instance.patch(`/auth/change-password`, data, config);
+}
+
+export const changeUserEmail = (data, config) => {
+  return instance.patch(`/auth/change-email`, data, config);
+}
+
 export const verifyAccount = (data, config) => {
   return instance.patch(`/auth/verify`, data, config);
 };
 
 export const sendVerificationCode = (data, config) => {
   return instance.post(`/auth/send-verification-code`, data, config);
+}
+
+export const confirmPasswordReset = (data, config) => {
+  return instance.patch(`/auth/confirm-password-reset`, data, config);
+}
+
+export const resetPassword = (data, config) => {
+  return instance.patch(`/auth/reset-password`, data, config);
 }
 
 export const deleteAccount = (data, config) => {
@@ -57,10 +73,6 @@ export const updateUserCountry = (data, config, userId) => {
 
 export const changeUserAvatar = (data, config, userId) => {
   return instance.patch(`/users/${userId}/change-avatar`, data, config);
-}
-
-export const changeUserPassword = (data, config) => {
-  return instance.patch(`/auth/change-password`, data, config);
 }
 
 export const getBooks = (config, userId, queryString) => {

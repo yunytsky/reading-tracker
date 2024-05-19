@@ -31,7 +31,6 @@
         position: absolute;
         bottom: 5px;
         right: 0;
-        z-index: 999;
     }
 
 }
@@ -120,7 +119,7 @@
     margin: -1.25em 0 1em 0;
 }
 
-.profile-avatars-form, .delete-account-form{
+.profile-avatars-form, .delete-account-form, .verify-email-change-form{
     display: flex;
     flex-direction: column;
     background-color: $white;
@@ -139,6 +138,35 @@
         text-align: center;
     }
 }
+
+.verify-email-change-form{
+    align-items: center;
+    padding: 2em 3em;
+    h4{
+        font-weight: 600;
+        margin-bottom: .5em;
+    }
+    p{
+         @include body-2;
+         color: $black-75;;
+        margin-bottom: 1em;
+        text-align: center;
+    }
+
+    .verification-resend{
+        @include body-2;
+        button{
+            @include body-2;
+        }
+    }
+
+    .verification-image{
+        img{
+            width: 14em;
+        }
+    }
+}
+
 .delete-account-form{
     align-items: center;
     padding: 2em;

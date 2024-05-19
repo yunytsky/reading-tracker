@@ -2,9 +2,10 @@ import { useContext, useEffect, useState } from "react";
 import {AuthContext} from "../context/AuthContext"
 import verificationImage from "../assets/verification-bg.svg"
 import { useLocation, useNavigate } from "react-router-dom";
-import { sendVerificationCode, verifyAccount } from "../api";
+import { confirmPasswordReset, sendVerificationCode, verifyAccount } from "../api";
 
 const ResetPasswordVerification = () => {
+    const {user} = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
     const [email, setEmail] = useState("");
@@ -17,12 +18,14 @@ const ResetPasswordVerification = () => {
     const [resendCountdown, setResendCountdown] = useState(0);
 
     useEffect(() => {
-       if(!location.state && !location.state.email){
+      if (user) {
+        navigate("/library");
+      }else if(!location.state || !location.state.email){
         navigate("/login");
        }else{
         setEmail(location.state.email);
        }
-    }, [location.state])
+    }, [user, location]); 
 
 
 
@@ -60,14 +63,14 @@ const ResetPasswordVerification = () => {
         }
         const config = {withCredentials: true};
         const code = verificationCode.join("");
-        // const res = await verifyAccount({code}, config);
+
+        const res = await confirmPasswordReset({email, code}, config);
 
         setVerificationSuccess(true);
 
         setTimeout(() => {
           setVerificationSuccess(false);
-          setUser(res.data.user);
-          localStorage.setItem("user", JSON.stringify(res.data.user));
+          navigate("/reset-password/new", { state: { email } })
         }, 4000);
 
       } catch (error) {

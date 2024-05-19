@@ -1,4 +1,4 @@
-import { findByUsername, findByEmail, createUser, findById, changeUserPassword, getVerificationInstance, updateUserVerifiedStatus, deleteVerificationInstance, deleteUser } from "../database/functions.js";
+import { findByUsername, findByEmail, createUser, findById, changeUserPassword, getVerificationInstance, updateUserVerifiedStatus, deleteVerificationInstance, deleteUser, updateVerificationInstanceConfirmationStatus, updateUserEmail } from "../database/functions.js";
 import { generatePassword, issueJWT, sendCode, validatePassword } from "../lib/utils.js";
 
 export async function signup(req, res) {
@@ -166,11 +166,78 @@ export async function deleteAccount(req, res) {
     }
 }
 
-
 export async function confirmPasswordReset(req,res) {
     try {
-        
+        //Get the code for this user 
+        const [verificationInstances] = await getVerificationInstance(req.body.email, "password-reset");
+        const verificationInstance = verificationInstances[0];
+
+        //Check if code is correct
+        if(req.body.code == verificationInstance.code){
+            await updateVerificationInstanceConfirmationStatus(true, verificationInstance.verificationId);
+            
+            return res.status(200).json({error: false, message: "Code successfully confirmed"});
+        }else{
+            return res.status(400).json({error: true, message: "Incorrect code"});
+        }
+
+
     } catch (error) {
+        console.log(error)
+        return res.status(500).json({ error: true, message: error.message });
+
+    }
+}
+
+export async function resetPassword(req, res) {
+    try {
+        //Get the code for this user 
+        const [verificationInstances] = await getVerificationInstance(req.body.email, "password-reset");
+        const verificationInstance = verificationInstances[0];
+
+        //Check if code was confirmed
+        if(!verificationInstance.confirmed){
+            return res.status(403).json({error: true, message: "Action forbidden"});
+        }else{            
+            //Update password
+            const [userData] = await findByEmail(req.body.email);
+            const user = userData[0];
+            const password = await generatePassword(req.body.password);
+            await changeUserPassword(password, us);
+
+            //Delete verification instance
+            await deleteVerificationInstance(verificationInstance.verificationId);
+
+            return res.status(200).json({error: false, message: "Password has been successfully reset"});
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ error: true, message: error.message });
+
+    }
+}
+
+export async function changeEmail(req, res) {
+    try {
+        //Get the code for this user 
+        const [verificationInstances] = await getVerificationInstance(req.body.email, "email-change");
+        const verificationInstance = verificationInstances[0];
+
+        //Check if code is correct
+        if(req.body.code == verificationInstance.code){
+         await updateUserEmail(req.body.email, req.user.sub);
+         await deleteVerificationInstance(verificationInstance.verificationId);
+
+         const [updatedUserData] = await findById(req.user.sub);
+         const updatedUser = updatedUserData[0];
+         
+         return res.status(200).json({error: false, message: "Email successfully changed", user: updatedUser});
+        }else{
+            return res.status(400).json({error: true, message: "Incorrect code"});
+        }
+      
+    } catch (error) {
+        console.log(error)
         return res.status(500).json({ error: true, message: error.message });
 
     }

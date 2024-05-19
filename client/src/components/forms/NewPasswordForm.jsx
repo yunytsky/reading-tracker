@@ -2,8 +2,9 @@ import { restorePasswordSchema } from "../../schemas";
 import {useFormik} from "formik";
 import {  useState } from "react";
 import {  useNavigate } from "react-router-dom";
+import { resetPassword } from "../../api";
 
-const NewPasswordForm = () => {
+const NewPasswordForm = ({email}) => {
     const [submitError, setSubmitError] = useState({error: false, message: ""});
     const [passwordUpdatedMessageVisible, setPasswordUpdatedMessageVisible] = useState(false);
     const navigate = useNavigate();
@@ -14,15 +15,21 @@ const NewPasswordForm = () => {
           setSubmitError({error: false, message: ""});
         }
 
-
         const config = {withCredentials: true}
-       
+        const res = await resetPassword({...values, email}, config);
+        setPasswordUpdatedMessageVisible(true);
 
+        
+        setTimeout(() => {
+          setPasswordUpdatedMessageVisible(false);
+          actions.resetForm();
+          navigate("/login");
+        }, 3000);
+       
       } catch (error) {
-        if(error.response && error.response.status == 400 && error.response.data.message){
+        if(error.response && error.response.status == 400 || error.response.status == 403 && error.response.data.message){
           setSubmitError({error: true, message: error.response.data.message})
         }else{
-          
           setSubmitError({error: true, message: "Error"})
         }
       }
@@ -40,44 +47,38 @@ const NewPasswordForm = () => {
     return (
       <form onSubmit={formik.handleSubmit} className="login-form">
         {/* Password */}
-        <label className="profile-input-label" htmlFor="password">
+        <label className="form-label" htmlFor="password">
           Password
         </label>
         <input
           type="password"
-          className="profile-input"
+          className="form-input"
           name="password"
           id="password"
           value={formik.values.password}
-          onChange={(e) => {
-            formik.handleChange(e);
-            setPasswordRequiredError(false);
-          }}
+          onChange={formik.handleChange}
         />
 
         {formik.errors.password && formik.touched.password && (
-          <span className="profile-info-error">{formik.errors.password}</span>
+          <span className="form-error">{formik.errors.password}</span>
         )}
 
         {/* Password confirmation */}
-        <label className="profile-input-label" htmlFor="passwordConfirmation">
+        <label className="form-label" htmlFor="passwordConfirmation">
           Password confirmation
         </label>
         <input
           type="password"
-          className="profile-input"
+          className="form-input"
           name="passwordConfirmation"
           id="passwordConfirmation"
           value={formik.values.passwordConfirmation}
-          onChange={(e) => {
-            formik.handleChange(e);
-            setPasswordConfirmationRequiredError(false);
-          }}
+          onChange={formik.handleChange}
         />
 
         {formik.errors.passwordConfirmation &&
           formik.touched.passwordConfirmation && (
-            <span className="profile-info-error">
+            <span className="form-error">
               {formik.errors.passwordConfirmation}
             </span>
           )}
@@ -85,19 +86,19 @@ const NewPasswordForm = () => {
 
         {/* Password successfully updated message*/}
         {passwordUpdatedMessageVisible && (
-          <span className="profile-info-password-updated-message">
+          <span className="new-password-form-updated-message">
             ✔ Password successfully updated
           </span>
         )}
 
         {/* Save button */}
-        <button className="profile-save-button button" type="submit">
+        <button className="new-password-form-button button" type="submit">
           Save
         </button>
 
         {/* Submit error */}
         {submitError.error && (
-          <span className="profile-info-submit-error">
+          <span className="form-submit-error">
             {submitError.message}
           </span>
         )}

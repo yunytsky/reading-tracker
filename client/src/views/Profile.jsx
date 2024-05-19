@@ -1,10 +1,19 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { changeUserAvatar, changeUserPassword, deleteAccount, getAvatars, updateUserCountry } from "../api";
+import {
+  changeUserAvatar,
+  changeUserEmail,
+  changeUserPassword,
+  deleteAccount,
+  getAvatars,
+  sendVerificationCode,
+  updateUserCountry,
+} from "../api";
 import { useFormik } from "formik";
 import { passwordSchema, userInfoSchema } from "../schemas";
 import DeleteWarning from "../components/DeleteWarning";
+import verificationImage from "../assets/verification-bg.svg";
 
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -16,21 +25,45 @@ const Profile = () => {
 
   const [submitError, setSubmitError] = useState({ error: false, message: "" });
 
-  const [currentPasswordRequiredError, setCurrentPasswordRequiredError] = useState(false);
+  const [currentPasswordRequiredError, setCurrentPasswordRequiredError] =
+    useState(false);
   const [passwordRequiredError, setPasswordRequiredError] = useState(false);
-  const [passwordConfirmationequiredError,setPasswordConfirmationRequiredError] = useState(false);
-  const [passwordUpdatedMessageVisible, setPasswordUpdatedMessageVisible] = useState(false);
+  const [
+    passwordConfirmationequiredError,
+    setPasswordConfirmationRequiredError,
+  ] = useState(false);
+  const [passwordUpdatedMessageVisible, setPasswordUpdatedMessageVisible] =
+    useState(false);
 
   const [avatarsFormVisible, setAvatarsFormVisible] = useState(false);
   const avatarsFormRef = useRef(null);
   const [selectedAvatarId, setSelectedAvatarId] = useState(null);
 
-  const [deleteAccountFormVisible, setDeleteAccountFormVisible] = useState(false);
-  const [deleteAccountConfirmationVisible, setDeleteAccountConfirmationVisible] = useState(false);
-  const [deleteAccountFormError, setDeleteAccountFormError] = useState({error: false, message: ""});
+  const [deleteAccountFormVisible, setDeleteAccountFormVisible] =
+    useState(false);
+  const [
+    deleteAccountConfirmationVisible,
+    setDeleteAccountConfirmationVisible,
+  ] = useState(false);
+  const [deleteAccountFormError, setDeleteAccountFormError] = useState({
+    error: false,
+    message: "",
+  });
   const deleteAccountFormRef = useRef(null);
   const deleteAccountConfirmationRef = useRef(null);
 
+  const [verifyEmailChangeFormVisible, setVerifyEmailChangeFormVisible] =
+    useState(false);
+  const [verificationCode, setVerificationCode] = useState([]);
+  const [verificationResendBlocked, setVerificationResendBlocked] =
+    useState(false);
+  const [verificationError, setVerificationError] = useState({
+    error: false,
+    message: "",
+    type: "",
+  });
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(0);
 
   //Fetch flags and avatars
   useEffect(() => {
@@ -42,7 +75,9 @@ const Profile = () => {
 
       //Set avatars
       setAvatars(resAvatars.data.avatars);
-      const userAvatar = resAvatars.data.avatars.find(avatar => avatar.avatarId === user.avatarId);
+      const userAvatar = resAvatars.data.avatars.find(
+        (avatar) => avatar.avatarId === user.avatarId
+      );
       setUserAvatarPath(userAvatar.path);
       setSelectedAvatarId(userAvatar.avatarId);
 
@@ -73,6 +108,152 @@ const Profile = () => {
 
     fetchData();
   }, [user]);
+
+  const handleInput = (e) => {
+    if (e.target.value.length > 1) {
+      e.target.value = e.target.value.slice(0, 1);
+    }
+
+    if (
+      e.target.id !== "last-verification-input" &&
+      e.target.value.length !== 0
+    ) {
+      e.target.nextSibling.focus();
+    }
+  };
+
+  const handleChange = (e, index) => {
+    if (verificationError.error) {
+      setVerificationError({ error: false, message: "", type: "" });
+    }
+
+    setVerificationCode((prevCode) => {
+      const updatedCode = [...prevCode];
+      updatedCode[index] = e.target.value;
+      return updatedCode;
+    });
+  };
+
+  const handleVerify = async () => {
+    try {
+      if (verificationError.error) {
+        setVerificationError({ error: false, message: "", type: "" });
+      }
+
+      if (
+        verificationCode.length < 6 ||
+        verificationCode.some((value) => value === undefined || value === "")
+      ) {
+        setVerificationError({
+          error: true,
+          message: "Enter the code",
+          type: "empty-error",
+        });
+        return;
+      }
+      const config = { withCredentials: true };
+      const code = verificationCode.join("");
+      const res = await changeUserEmail({ email: formik.values.email, code }, config);
+
+      setVerificationSuccess(true);
+
+      setTimeout(() => {
+        setVerificationSuccess(false);
+        setUser(res.data.user);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        setVerificationCode([]);
+        setVerifyEmailChangeFormVisible(false);
+      }, 4000);
+
+
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.message
+      ) {
+        setVerificationError({
+          error: true,
+          message: error.response.data.message,
+          type: "code-error",
+        });
+      } else {
+        console.log(error)
+        setVerificationError({
+          error: true,
+          message: "Internal server error",
+          type: "other",
+        });
+      }
+    }
+  };
+
+  //Countdown
+  useEffect(() => {
+    const savedCountdown = JSON.parse(localStorage.getItem("countdown"));
+    if (savedCountdown) {
+      setResendCountdown(savedCountdown);
+      setVerificationResendBlocked(true);
+
+      const interval = setInterval(() => {
+        setResendCountdown((prevCountdown) => {
+          if (prevCountdown <= 1) {
+            clearInterval(interval);
+            setVerificationResendBlocked(false);
+            localStorage.removeItem("countdown");
+            return 0;
+          }
+          return prevCountdown - 1;
+        });
+
+        const newCountdown = JSON.parse(localStorage.getItem("countdown")) - 1;
+        localStorage.setItem("countdown", newCountdown);
+        return newCountdown;
+      }, 1000);
+
+      return () => clearInterval(interval); // Clean up
+    }
+  }, []);
+
+  const handleResend = async () => {
+    try {
+      if (verificationError.error) {
+        setVerificationError({ error: false, message: "", type: "" });
+      }
+
+      const config = { withCredentials: true };
+      const res = await sendVerificationCode(
+        { email: user.email, type: "account-verification" },
+        config
+      );
+
+      setVerificationResendBlocked(true);
+      setResendCountdown(120);
+      localStorage.setItem("countdown", 120);
+
+      const interval = setInterval(() => {
+        setResendCountdown((prevCountdown) => {
+          if (prevCountdown <= 1) {
+            clearInterval(interval);
+            setVerificationResendBlocked(false);
+            localStorage.removeItem("countdown");
+            return 0;
+          }
+          return prevCountdown - 1;
+        });
+
+        const newCountdown = JSON.parse(localStorage.getItem("countdown")) - 1;
+        localStorage.setItem("countdown", newCountdown);
+        return newCountdown;
+      }, 1000);
+    } catch (error) {
+      setVerificationError({
+        error: true,
+        message: "Couldn't resend a code",
+        type: "other",
+      });
+    }
+  };
 
   const onSubmit = async (values, actions) => {
     try {
@@ -139,6 +320,16 @@ const Profile = () => {
       }
 
       //Update email
+      if (user.email != values.email) {
+        const res = await sendVerificationCode(
+          { email: values.email, type: "email-change" },
+          config
+        );
+
+        setVerifyEmailChangeFormVisible(true);
+      }
+
+      //Update email
     } catch (error) {
       if (error.response && error.response.data.message) {
         setSubmitError({ error: true, message: error.response.data.message });
@@ -150,9 +341,13 @@ const Profile = () => {
 
   const handleChangeAvatar = async () => {
     try {
-      if(user.avatarId != selectedAvatarId){
-        const config = {withCredentials: true};
-        const res = await changeUserAvatar({avatarId: selectedAvatarId}, config, user.userId)
+      if (user.avatarId != selectedAvatarId) {
+        const config = { withCredentials: true };
+        const res = await changeUserAvatar(
+          { avatarId: selectedAvatarId },
+          config,
+          user.userId
+        );
 
         setUser(res.data.user);
         localStorage.setItem("user", JSON.stringify(res.data.user));
@@ -160,14 +355,19 @@ const Profile = () => {
         setAvatarsFormVisible(false);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-   //Restrict screen height when overlay is visible
-   useEffect(() => {
+  //Restrict screen height when overlay is visible
+  useEffect(() => {
     const handleBodyStyles = () => {
-      if (avatarsFormVisible || deleteAccountConfirmationVisible || deleteAccountFormVisible) {
+      if (
+        avatarsFormVisible ||
+        deleteAccountConfirmationVisible ||
+        deleteAccountFormVisible ||
+        verifyEmailChangeFormVisible
+      ) {
         window.scrollTo(0, 0);
         document.body.style.height = "100vh";
         document.body.style.overflow = "hidden";
@@ -180,59 +380,75 @@ const Profile = () => {
       document.body.style.height = "auto";
       document.body.style.overflow = "visible";
     };
-  }, [avatarsFormVisible, deleteAccountConfirmationVisible, deleteAccountFormVisible]);
+  }, [
+    avatarsFormVisible,
+    deleteAccountConfirmationVisible,
+    deleteAccountFormVisible,
+    verifyEmailChangeFormVisible,
+  ]);
 
   //Hide popup-form/dropdown-menu when clicked elsewhere
   useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (
-          avatarsFormRef.current !== null &&
-          !avatarsFormRef.current.contains(event.target)
-        ) {
-          setAvatarsFormVisible(false);
-        }
+    const handleClickOutside = (event) => {
+      if (
+        avatarsFormRef.current !== null &&
+        !avatarsFormRef.current.contains(event.target)
+      ) {
+        setAvatarsFormVisible(false);
+      }
 
-        if(deleteAccountConfirmationRef.current !== null &&
-          !deleteAccountConfirmationRef.current.contains(event.target)
-        ){
-          setDeleteAccountConfirmationVisible(false);
-        }
+      if (
+        deleteAccountConfirmationRef.current !== null &&
+        !deleteAccountConfirmationRef.current.contains(event.target)
+      ) {
+        setDeleteAccountConfirmationVisible(false);
+      }
 
-        if(deleteAccountFormRef.current !== null &&
-          !deleteAccountFormRef.current.contains(event.target)
-        ){
-          formikDeleteAccount.resetForm();
-          setDeleteAccountFormVisible(false);
-        }
-      };
+      if (
+        deleteAccountFormRef.current !== null &&
+        !deleteAccountFormRef.current.contains(event.target)
+      ) {
+        formikDeleteAccount.resetForm();
+        setDeleteAccountFormVisible(false);
+      }
+    };
 
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleDeleteAccount = async (values, actions) => {
     try {
-      if(deleteAccountFormError.error){
-        setDeleteAccountFormError({error: false, message: ""});
+      if (deleteAccountFormError.error) {
+        setDeleteAccountFormError({ error: false, message: "" });
       }
 
-      const config = {withCredentials: true};
-      const res = await deleteAccount({password: values.password}, config);
-      
+      const config = { withCredentials: true };
+      const res = await deleteAccount({ password: values.password }, config);
+
       actions.resetForm();
       setUser(null);
       localStorage.removeItem("user");
-      
     } catch (error) {
-      if(error.response && error.response.status == 400 && error.response.data.message){
-        setDeleteAccountFormError({error: true, message: error.response.data.message})
-      }else{
-        setDeleteAccountFormError({error: true, message: "Internal server error, try again later"})
+      if (
+        error.response &&
+        error.response.status == 400 &&
+        error.response.data.message
+      ) {
+        setDeleteAccountFormError({
+          error: true,
+          message: error.response.data.message,
+        });
+      } else {
+        setDeleteAccountFormError({
+          error: true,
+          message: "Internal server error, try again later",
+        });
       }
     }
-  }
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -248,11 +464,11 @@ const Profile = () => {
 
   const formikDeleteAccount = useFormik({
     initialValues: {
-      password: ""
+      password: "",
     },
     validationSchema: passwordSchema,
     onSubmit: handleDeleteAccount,
-  })
+  });
 
   return (
     <div className="profile">
@@ -477,6 +693,188 @@ const Profile = () => {
             </button>
           </form>
 
+          {verifyEmailChangeFormVisible && (
+            <div className="verify-email-change-form">
+              <div className="verification-image">
+                <img src={verificationImage} alt="postman" />
+              </div>
+              <h4>Check your email</h4>
+              <p>
+                Code has been sent to {formik.values.email}. Enter below to change your
+                password. In case code is not entered, changes will not be
+                applied
+              </p>
+              <div
+                className={
+                  verificationSuccess
+                    ? "verification-inputs success blink"
+                    : "verification-inputs"
+                }
+              >
+                <input
+                  type="number"
+                  onInput={(e) => {
+                    handleInput(e);
+                  }}
+                  className={
+                    verificationError.error &&
+                    verificationError.type == "empty-error" &&
+                    (verificationCode[0] == undefined ||
+                      verificationCode[0] == "")
+                      ? "verification-input error shake"
+                      : verificationError.error &&
+                        verificationError.type == "code-error"
+                      ? "verification-input error shake"
+                      : "verification-input"
+                  }
+                  onChange={(e) => {
+                    handleChange(e, 0);
+                  }}
+                />
+                <input
+                  type="number"
+                  onInput={(e) => {
+                    handleInput(e);
+                  }}
+                  className={
+                    verificationError.error &&
+                    verificationError.type == "empty-error" &&
+                    (verificationCode[1] == undefined ||
+                      verificationCode[1] == "")
+                      ? "verification-input error shake"
+                      : verificationError.error &&
+                        verificationError.type == "code-error"
+                      ? "verification-input error shake"
+                      : "verification-input"
+                  }
+                  onChange={(e) => {
+                    handleChange(e, 1);
+                  }}
+                />
+                <input
+                  type="number"
+                  onInput={(e) => {
+                    handleInput(e);
+                  }}
+                  className={
+                    verificationError.error &&
+                    verificationError.type == "empty-error" &&
+                    (verificationCode[2] == undefined ||
+                      verificationCode[2] == "")
+                      ? "verification-input error shake"
+                      : verificationError.error &&
+                        verificationError.type == "code-error"
+                      ? "verification-input error shake"
+                      : "verification-input"
+                  }
+                  onChange={(e) => {
+                    handleChange(e, 2);
+                  }}
+                />
+                <input
+                  type="number"
+                  onInput={(e) => {
+                    handleInput(e);
+                  }}
+                  className={
+                    verificationError.error &&
+                    verificationError.type == "empty-error" &&
+                    (verificationCode[3] == undefined ||
+                      verificationCode[3] == "")
+                      ? "verification-input error shake"
+                      : verificationError.error &&
+                        verificationError.type == "code-error"
+                      ? "verification-input error shake"
+                      : "verification-input"
+                  }
+                  onChange={(e) => {
+                    handleChange(e, 3);
+                  }}
+                />
+                <input
+                  type="number"
+                  onInput={(e) => {
+                    handleInput(e);
+                  }}
+                  className={
+                    verificationError.error &&
+                    verificationError.type == "empty-error" &&
+                    (verificationCode[4] == undefined ||
+                      verificationCode[4] == "")
+                      ? "verification-input error shake"
+                      : verificationError.error &&
+                        verificationError.type == "code-error"
+                      ? "verification-input error shake"
+                      : "verification-input"
+                  }
+                  onChange={(e) => {
+                    handleChange(e, 4);
+                  }}
+                />
+                <input
+                  type="number"
+                  onInput={(e) => {
+                    handleInput(e);
+                  }}
+                  className={
+                    verificationError.error &&
+                    verificationError.type == "empty-error" &&
+                    (verificationCode[5] == undefined ||
+                      verificationCode[5] == "")
+                      ? "verification-input error shake"
+                      : verificationError.error &&
+                        verificationError.type == "code-error"
+                      ? "verification-input error shake"
+                      : "verification-input"
+                  }
+                  id="last-verification-input"
+                  onChange={(e) => {
+                    handleChange(e, 5);
+                  }}
+                />
+              </div>
+              <div className="verification-resend">
+                <span>Never got a code?</span>{" "}
+                <button
+                  disabled={verificationResendBlocked}
+                  onClick={handleResend}
+                >
+                  Resend
+                </button>
+                {verificationResendBlocked && (
+                  <div className="verification-resend-timer">
+                    You can try again in{" "}
+                    <span className="time">
+                      {Math.floor(resendCountdown / 60)}:
+                      {String(resendCountdown % 60).padStart(2, "0")}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {verificationError.error && (
+                <span className="verification-error">
+                  {verificationError.message}
+                </span>
+              )}
+
+              <div className="verification-buttons">
+                <button
+                  className="verification-cancel-button button empty"
+                  onClick={() => {setVerifyEmailChangeFormVisible(false); if(verificationError){setVerificationError({error: false, message: "", type: ""})}}}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="verification-verify-button button"
+                  onClick={handleVerify}
+                >
+                  Verify
+                </button>
+              </div>
+            </div>
+          )}
+
           {deleteAccountFormVisible && (
             <form
               className="delete-account-form"
@@ -497,7 +895,11 @@ const Profile = () => {
                   name="password"
                   type="password"
                   className="form-input"
-                  onInput={() => {if(deleteAccountFormError){setDeleteAccountFormError({error:false, message: ""})}}}
+                  onInput={() => {
+                    if (deleteAccountFormError) {
+                      setDeleteAccountFormError({ error: false, message: "" });
+                    }
+                  }}
                   onChange={formikDeleteAccount.handleChange}
                   value={formikDeleteAccount.values.password}
                 />
@@ -563,13 +965,14 @@ const Profile = () => {
         style={
           avatarsFormVisible ||
           deleteAccountFormVisible ||
-          deleteAccountConfirmationVisible
+          deleteAccountConfirmationVisible ||
+          verifyEmailChangeFormVisible
             ? { display: "block" }
             : { display: "none" }
         }
       ></div>
     </div>
   );
-}
+};
 
 export default Profile;

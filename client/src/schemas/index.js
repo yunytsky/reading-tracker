@@ -20,7 +20,7 @@ export const signupSchema = yup.object().shape({
     .string()
     .min(6, "Password must contain at least 6 characters")
     .matches(/[a-z]/, "Password must contain at least 1 small letter")
-    .matches(/\d/, "Password mut contain at least 1 digit")
+    .matches(/\d/, "Password must contain at least 1 digit")
     .required("Required"),
   passwordConfirmation: yup
     .string()
@@ -38,7 +38,7 @@ export const userInfoSchema = yup.object().shape({
     .string()
     .min(6, "Password must contain at least 6 characters")
     .matches(/[a-z]/, "Password must contain at least 1 small letter")
-    .matches(/\d/, "Password mut contain at least 1 digit"),
+    .matches(/\d/, "Password must contain at least 1 digit"),
   passwordConfirmation: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords don't match")
@@ -57,7 +57,7 @@ export const restorePasswordSchema = yup.object().shape({
   .string()
   .min(6, "Password must contain at least 6 characters")
   .matches(/[a-z]/, "Password must contain at least 1 small letter")
-  .matches(/\d/, "Password mut contain at least 1 digit")
+  .matches(/\d/, "Password must contain at least 1 digit")
   .required("Required"),
 passwordConfirmation: yup
   .string()

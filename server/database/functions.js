@@ -351,6 +351,15 @@ export function updateVerificationInstance(code, expiresIn, verificaionId) {
 `, [code, expiresIn, verificaionId]) 
 }
 
+export function updateVerificationInstanceConfirmationStatus(status, verificaionId) {
+    return pool.execute(`
+    UPDATE verifications
+    SET confirmed = ?
+    WHERE verificationId = ?
+`, [status, verificaionId]) 
+}
+
+
 export function deleteVerificationInstance(verificaionId) {
     return pool.execute(`
     DELETE FROM verifications
@@ -363,6 +372,13 @@ export function updateUserVerifiedStatus(status, userId) {
         UPDATE users
         SET verified = ? WHERE userId = ?
     `, [status, userId]);
+}
+
+export function updateUserEmail(email, userId) {
+    return pool.execute(`
+        UPDATE users
+        SET email = ? WHERE userId = ?
+    `, [email, userId]);
 }
 
 export async function deleteUser(userId) {

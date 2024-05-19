@@ -279,6 +279,17 @@ body {
   margin-right: 4px;
 }
 
+.error-page {
+  text-align: center;
+  padding: 4em 1em;
+}
+.error-page h1 {
+  color: #F9455A;
+}
+.error-page p {
+  color: #40404A;
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -413,6 +424,14 @@ body {
   margin-bottom: 1.5em;
 }
 
+.new-password-form-updated-message {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+  color: #20bf6b;
+  margin: -1.25em 0 1em 0;
+}
+
 .reset-password-initial {
   padding-top: 5em;
 }
@@ -435,6 +454,20 @@ body {
 }
 .verification-image img {
   width: 16em;
+}
+
+.verification-buttons {
+  display: flex;
+}
+.verification-buttons .button {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding: 6px 24px;
+  margin-right: 0.75em;
+}
+.verification-buttons .button:last-child {
+  margin-right: 0;
 }
 
 .verification-verify-button {
@@ -1464,7 +1497,6 @@ body {
   position: absolute;
   bottom: 5px;
   right: 0;
-  z-index: 999;
 }
 
 .profile-user {
@@ -1555,7 +1587,7 @@ body {
   margin: -1.25em 0 1em 0;
 }
 
-.profile-avatars-form, .delete-account-form {
+.profile-avatars-form, .delete-account-form, .verify-email-change-form {
   display: flex;
   flex-direction: column;
   background-color: #fff;
@@ -1569,10 +1601,37 @@ body {
   border: 1px solid #E6E6E7;
   padding: 1em 0;
 }
-.profile-avatars-form h5, .delete-account-form h5 {
+.profile-avatars-form h5, .delete-account-form h5, .verify-email-change-form h5 {
   font-weight: 500;
   margin-bottom: 1.5em;
   text-align: center;
+}
+
+.verify-email-change-form {
+  align-items: center;
+  padding: 2em 3em;
+}
+.verify-email-change-form h4 {
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+.verify-email-change-form p {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #40404A;
+  margin-bottom: 1em;
+  text-align: center;
+}
+.verify-email-change-form .verification-resend {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.verify-email-change-form .verification-resend button {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.verify-email-change-form .verification-image img {
+  width: 14em;
 }
 
 .delete-account-form {
