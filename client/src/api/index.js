@@ -39,6 +39,14 @@ export const logout = (config) => {
   return instance.post(`/auth/log-out`, {}, config);
 };
 
+export const verifyAccount = (data, config) => {
+  return instance.patch(`/auth/verify`, data, config);
+};
+
+export const resendVerificationCode = (data, config) => {
+  return instance.post(`/auth/resend-verification-code`, data, config);
+}
+
 export const updateUserCountry = (data, config, userId) => {
   return instance.patch(`/users/${userId}/update-country`, data, config);
 }

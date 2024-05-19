@@ -1,10 +1,11 @@
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import mainImage from "../assets/main-bg-2.svg";
-import { Link } from "react-router-dom";
+import mainImage from "../assets/main-bg.svg";
+import { Link, useNavigate } from "react-router-dom";
 
 const Main = () => {
     const {user} = useContext(AuthContext);
+    const navigate = useNavigate();
     
     useEffect(() => {
         if(user) {

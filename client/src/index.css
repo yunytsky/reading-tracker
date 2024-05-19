@@ -221,6 +221,21 @@ body {
     transform: translateX(0);
   }
 }
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.blink {
+  animation: blink 2s infinite;
+}
+
 .shake {
   animation: shake 0.5s;
 }
@@ -375,6 +390,18 @@ body {
   background-color: rgba(242, 242, 243, 0.5);
 }
 
+.forgot-password-button {
+  text-align: left;
+  margin-top: -1em;
+  color: #808086;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.forgot-password-button:hover, .forgot-password-button:active, .forgot-password-button:focus {
+  color: #40404A;
+}
+
 .login, .signup, .verification {
   padding: 3em 2em;
   display: flex;
@@ -386,6 +413,9 @@ body {
   margin-bottom: 1.5em;
 }
 
+.verification {
+  padding-top: 5em;
+}
 .verification h3 {
   margin-bottom: 0.25em;
 }
@@ -396,8 +426,23 @@ body {
   margin-bottom: 1.5em;
 }
 
+.verification-image {
+  margin-bottom: 0.5em;
+}
+.verification-image img {
+  width: 16em;
+}
+
+.verification-verify-button {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding: 6px 24px;
+}
+
 .verification-inputs {
   display: flex;
+  margin-bottom: 0.5em;
 }
 
 .verification-input {
@@ -424,6 +469,47 @@ body {
 }
 .verification-input:last-child {
   margin-right: 0;
+}
+
+.verification-inputs.success .verification-input {
+  border: 2px solid #20bf6b;
+}
+
+.verification-input.error {
+  border: 1px solid #F9455A;
+}
+
+.verification-error {
+  color: #F9455A;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: -2em 0 1.5em 0;
+}
+
+.verification-resend {
+  margin-bottom: 2em;
+  color: #808086;
+  text-align: center;
+}
+.verification-resend button {
+  color: #40404A;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.verification-resend button:hover, .verification-resend button:active, .verification-resend button:focus {
+  color: #01000D;
+}
+.verification-resend button:disabled {
+  color: #808086;
+}
+
+.verification-resend-timer {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.verification-resend-timer .time {
+  color: #007BD0;
 }
 
 .data-empty {

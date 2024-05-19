@@ -11,7 +11,8 @@ import BooksStats from "./components/charts/BooksStats";
 import GenreStats from "./components/charts/GenreStats";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Main from "./views/Main";
-import Verification from "./views/Verification";
+import AccountVerification from "./views/AccountVerification";
+import ResetPasswordVerification from "./views/ResetPasswordVerification";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,7 +20,8 @@ const router = createBrowserRouter(
       <Route index element={<Main/>}/>
       <Route path="login" element={<Login/>}/>
       <Route path="signup" element={<Signup/>}/>
-      <Route path="verification" element={<Verification/>}/>
+      <Route path="account-verification" element={<AccountVerification/>}/>
+      <Route path="reset-password-verification" element={<ResetPasswordVerification/>}/>
 
       <Route element={<ProtectedRoute/>}>
         <Route path="library" element={<Library/>}/>

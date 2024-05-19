@@ -81,21 +81,25 @@ const LoginForm = () => {
           <span className="form-error">{formik.errors.password}</span>
         )}
 
+        <Link to={"restore-password-verification"} className="forgot-password-button" type="button">
+          Forgot password?
+        </Link>
+
         {/* Submit button */}
         <button type="submit" className="button">
           Log in
         </button>
 
         {/* Submit error */}
-        {submitError.error && <span className="form-submit-error">{submitError.message}</span>}
-
+        {submitError.error && (
+          <span className="form-submit-error">{submitError.message}</span>
+        )}
 
         {/* Auxiliary link */}
         <span className="form-auxiliary-link">
           Don't have an account yet?
           <Link to="/signup"> Sign up</Link>
         </span>
-        
       </form>
     );
 };

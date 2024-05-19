@@ -1,5 +1,5 @@
-import { findByUsername, findByEmail, createUser, findById, changeUserPassword } from "../database/functions.js";
-import { generatePassword, issueJWT, validatePassword } from "../lib/utils.js";
+import { findByUsername, findByEmail, createUser, findById, changeUserPassword, getVerificationInstance, updateUserVerifiedStatus, deleteVerificationInstance } from "../database/functions.js";
+import { generatePassword, issueJWT, sendVerificationCode, validatePassword } from "../lib/utils.js";
 
 export async function signup(req, res) {
     try {
@@ -16,12 +16,22 @@ export async function signup(req, res) {
             return res.status(409).json({error: true, message: "Username is already taken"});
         }
 
-        //Create a new user
+        //Generate password and send verification email
         const password = await generatePassword(req.body.password);
+        await sendVerificationCode(req.body.email, "verification"); 
+
+        //Create new user
         const [newUser] = await createUser(req.body.email, req.body.username, req.body.country, password);
 
-        return res.status(201).json({error: false, message: "Account created", newUser: newUser.insertId});
-
+        //Log new user in
+        const [userData] = await findById(newUser.insertId);
+        const user = userData[0];
+        console.log(user)
+        const token = issueJWT(user);
+        console.log(token)
+        delete user.password;
+        
+        return res.status(201).cookie("token", token, {httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000}).json({ error: false, message: "Account created", user: user});
     } catch (error) {
         console.log(error)
         return res.status(500).json({ error: true, message: error.message });
@@ -89,6 +99,52 @@ export async function updateEmail(req, res) {
     try {
         
 
+
+    } catch (error) {
+        return res.status(500).json({ error: true, message: error.message });
+    }
+}
+
+export async function resendVerificationCode (req, res) {
+    try{
+        const [userData] = await findById(req.user.sub);
+        const user = userData[0];
+        
+        await sendVerificationCode(user.email, "verification"); 
+       
+        return res.status(200).json({ error: false, message: "Verification code has been resent" })
+
+    }catch(err) {
+        console.log(err)
+       return res.status(500).json({ error: false, message: err.message })
+    }
+ }
+
+export async function verifyAccount(req, res) {
+    try {
+        const [userData] = await findById(req.user.sub);
+        const user = userData[0];
+        
+        //Get the code for this user 
+        const [verificationInstances] = await getVerificationInstance(user.email, "verification");
+        const verificationInstance = verificationInstances[0];
+ 
+        if(!verificationInstance || verificationInstance.expireAt < new Date()){
+            return res.status(400).json({error: true, message: "Incorrect code"});
+        }
+
+        //Check if code is correct
+        if(req.body.code == verificationInstance.code){
+            await updateUserVerifiedStatus(1, req.user.sub);
+            await deleteVerificationInstance(verificationInstance.verificationId);
+
+            const [updatedUserData] = await findById(req.user.sub);
+            const updatedUser = updatedUserData[0];
+            
+            return res.status(200).json({error: false, message: "Account successfully verified", user: updatedUser});
+        }else{
+            return res.status(400).json({error: true, message: "Incorrect code"});
+        }
 
     } catch (error) {
         return res.status(500).json({ error: true, message: error.message });

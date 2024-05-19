@@ -1,10 +1,15 @@
 import { signupSchema } from "../../schemas";
 import {useFormik} from "formik";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { signup } from "../../api";
 import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
+
 const SignupForm = () => {
+  const navigate = useNavigate();
+  const {setUser} = useContext(AuthContext);
+
   const [submitError, setSubmitError] = useState({error: false, message: ""});
   const [countries, setCountries] = useState([]);
 
@@ -41,8 +46,12 @@ const SignupForm = () => {
 
           const config = {withCredentials: true}
           const res = await signup(values, config);
-         
+          
+          localStorage.setItem("user", JSON.stringify(res.data.user));
+          setUser(res.data.user);
+          
           actions.resetForm();
+          navigate("/account-verification");
 
         } catch (error) {
           

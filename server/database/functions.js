@@ -328,3 +328,39 @@ export function getFinishedBooksYears(userId) {
         WHERE userId = ? AND finishedReading IS NOT NULL
     `, [userId])
 }
+
+export function createVerificationInstance(email, code, expiresIn, type) {
+    return pool.execute(`
+    INSERT INTO verifications(email, code, expireAt, type)
+    VALUES(?, ?, NOW() + INTERVAL ? MINUTE, ?)
+`, [email, code, expiresIn, type])
+}
+
+export function getVerificationInstance(email, type) {
+    return pool.execute(`
+    SELECT * FROM verifications
+    WHERE email = ? AND type = ?
+`, [email, type]) 
+}
+
+export function updateVerificationInstance(code, expiresIn, verificaionId) {
+    return pool.execute(`
+    UPDATE verifications
+    SET code = ?, expireAt = NOW() + INTERVAL ? MINUTE
+    WHERE verificationId = ?
+`, [code, expiresIn, verificaionId]) 
+}
+
+export function deleteVerificationInstance(verificaionId) {
+    return pool.execute(`
+    DELETE FROM verifications
+    WHERE verificationId = ?
+`, [verificaionId]) 
+}
+
+export function updateUserVerifiedStatus(status, userId) {
+    return pool.execute(`
+        UPDATE users
+        SET verified = ? WHERE userId = ?
+    `, [status, userId]);
+}

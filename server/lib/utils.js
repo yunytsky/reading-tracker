@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import { createVerificationInstance, getVerificationInstance, updateVerificationInstance } from "../database/functions.js";
 
 // Password generation 
 export async function generatePassword(plainTextPassword) {
@@ -33,6 +35,69 @@ export function issueJWT(user){
 }
 
 //Generate verification code
+const generateVerificationCode = (length) => {
+    const values = [];
 
+    for (let i = 0; i < length; i++) {
+        const value = Math.floor(Math.random() * 10);
+        values.push(value);
+    }
+
+    const code = values.join("");
+    return code;
+}
 
 //Send verification email
+export async function sendVerificationCode(receiver, type) {
+    try{
+       const expireIn = 120;
+       const code = generateVerificationCode(6);
+ 
+       let transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT,
+          secure: true,
+          auth: {
+             user: process.env.SMTP_USER,
+             pass: process.env.SMTP_PASSWORD
+          }
+       });
+ 
+       let options;
+       if(type === "verification"){
+          options = {
+             from: process.env.SMTP_USER,
+             to: receiver,
+             subject: "LitLog - verification code",
+             text: `Code for verification: ${code}`,
+             html: `<div><h3>Code will expire in 2 hours</h3><br/>If you have not attempted to register on <b>LitLog</b>, ignore this message</div><br/><h1>${code}</h1>`
+          }
+       }else if(type === "restoring") {
+          options = {
+             from: process.env.SMTP_USER,
+             to: receiver,
+             subject: "LitLog - restoring password",
+             text: `Code for restoring password: ${code}`,
+             html: "<div>Code will expire in 2 hours<br/>If you have not attempted to change your password, ignore this message</div>"
+          }
+       }
+ 
+        const info = await transporter.sendMail(options);
+
+        //Check if such a verification instance already exists
+        const [existingVerificationInstances] = await getVerificationInstance(receiver, type)
+        if(existingVerificationInstances.length > 0) {
+            const verificationInstanceId = existingVerificationInstances[0].verificationId;
+            const updatedVerificationInstance = await updateVerificationInstance(code, expireIn, verificationInstanceId);
+            return updatedVerificationInstance;
+        //If no create a new one
+        }else{
+            const verificationInstance = await createVerificationInstance(receiver, code, expireIn, type);
+            return verificationInstance
+        }
+ 
+    }catch(err){
+       throw new Error("Couldn't send verification code, try later");
+    }
+ 
+ }
