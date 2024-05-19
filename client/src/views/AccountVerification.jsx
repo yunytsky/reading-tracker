@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import {AuthContext} from "../context/AuthContext"
 import verificationImage from "../assets/verification-bg.svg"
 import { useNavigate } from "react-router-dom";
-import { resendVerificationCode, verifyAccount } from "../api";
+import { sendVerificationCode, verifyAccount } from "../api";
 
 const AccountVerification = () => {
     const {user, setUser} = useContext(AuthContext);
@@ -76,6 +76,7 @@ const AccountVerification = () => {
       }
     }
 
+    //Countdown
     useEffect(() => {
       const savedCountdown = JSON.parse(localStorage.getItem("countdown"));
       if(savedCountdown) {
@@ -114,7 +115,7 @@ const AccountVerification = () => {
         }
 
         const config = {withCredentials: true};
-        const res = await resendVerificationCode({}, config);
+        const res = await sendVerificationCode({email: user.email, type: "account-verification"}, config);
 
         setVerificationResendBlocked(true);
         setResendCountdown(120);

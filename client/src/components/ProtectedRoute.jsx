@@ -10,7 +10,7 @@ const ProtectedRoute = () => {
         {user && user.verified ? (
           <Outlet />
         ) : user && !user.verified ? (
-          <Navigate to={"/verification"} />
+          <Navigate to={"/account-verification"} />
         ) : (
           <Navigate to={"/login"} />
         )}

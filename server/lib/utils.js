@@ -35,7 +35,7 @@ export function issueJWT(user){
 }
 
 //Generate verification code
-const generateVerificationCode = (length) => {
+const generateCode = (length) => {
     const values = [];
 
     for (let i = 0; i < length; i++) {
@@ -48,10 +48,10 @@ const generateVerificationCode = (length) => {
 }
 
 //Send verification email
-export async function sendVerificationCode(receiver, type) {
+export async function sendCode(receiver, type) {
     try{
        const expireIn = 120;
-       const code = generateVerificationCode(6);
+       const code = generateCode(6);
  
        let transporter = nodemailer.createTransport({
           host: process.env.SMTP_HOST,
@@ -64,21 +64,21 @@ export async function sendVerificationCode(receiver, type) {
        });
  
        let options;
-       if(type === "verification"){
+       if(type === "account-verification"){
           options = {
              from: process.env.SMTP_USER,
              to: receiver,
              subject: "LitLog - verification code",
              text: `Code for verification: ${code}`,
-             html: `<div><h3>Code will expire in 2 hours</h3><br/>If you have not attempted to register on <b>LitLog</b>, ignore this message</div><br/><h1>${code}</h1>`
+             html: `<div>Code will expire in 2 hours<br/>If you have not attempted to register on <b>LitLog</b>, ignore this message</div><br/><h1>${code}</h1>`
           }
-       }else if(type === "restoring") {
+       }else if(type === "password-reset") {
           options = {
              from: process.env.SMTP_USER,
              to: receiver,
-             subject: "LitLog - restoring password",
+             subject: "LitLog - password reset",
              text: `Code for restoring password: ${code}`,
-             html: "<div>Code will expire in 2 hours<br/>If you have not attempted to change your password, ignore this message</div>"
+             html: `<div>Code will expire in 2 hours<br/>If you have not attempted to change your password, ignore this message</div><br/><h1>${code}</h1>`
           }
        }
  

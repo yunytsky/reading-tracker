@@ -8,8 +8,8 @@ import starIcon from "../assets/star.svg";
 import dotsIcon from "../assets/dots.svg";
 import editIcon from "../assets/edit.svg";
 import crossIcon from "../assets/cross.svg";
-import warningIcon from "../assets/warning.svg";
 import { AuthContext } from "../context/AuthContext";
+import DeleteWarning from "../components/DeleteWarning";
 
 
 const Book = () => {
@@ -808,13 +808,17 @@ const Book = () => {
                                 className="authors-form-author-delete-button"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (!deepEqual(deleteAuthorWarningVisible, {})) {
+                                  if (
+                                    !deepEqual(deleteAuthorWarningVisible, {})
+                                  ) {
                                     setDeleteAuthorWarningVisible({});
                                   } else {
-                                    setDeleteAuthorWarningVisible((prevVisible) => ({
-                                      [author.authorId]:
-                                        !prevVisible[author.authorId],
-                                    }));
+                                    setDeleteAuthorWarningVisible(
+                                      (prevVisible) => ({
+                                        [author.authorId]:
+                                          !prevVisible[author.authorId],
+                                      })
+                                    );
                                   }
                                 }}
                               >
@@ -878,44 +882,25 @@ const Book = () => {
                                 </div>
                               )}
                             </div>
-                          
                           </div>
 
                           {deleteAuthorWarningVisible[author.authorId] && (
-                              <div
-                                className="delete-warning"
-                                ref={deleteAuthorWarningRef}
-                              >
-                                <img src={warningIcon} alt="warning" />
-                                <h4>Are you sure?</h4>
-                                <p>Do you really want to delete the author?</p>
-                                <div className="delete-warning-buttons">
-                                  <button
-                                    className="delete-warning-cancel-button button empty"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setDeleteAuthorWarningVisible({});
-                                    }}
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    className="delete-warning-delete-button button red"
-                                    onClick={(e) => {
-                                      handleDeleteUserAuthor(
-                                        e,
-                                        author.authorId
-                                      );
-                                      setDeleteAuthorWarningVisible({});
-                                    }}
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              </div>
-                            )}
+                            <DeleteWarning
+                              ref={deleteAuthorWarningRef}
+                              onCancel={(e) => {
+                                e.stopPropagation();
+                                setDeleteAuthorWarningVisible({});
+                              }}
+                              onDelete={(e) => {
+                                handleDeleteUserAuthor(e, author.authorId);
+                                setDeleteAuthorWarningVisible({});
+                              }}
+                              message={
+                                "Do you really want to delete the author?"
+                              }
+                            />
+                          )}
                         </div>
-
                       );
                     })}
                 </div>
@@ -1205,34 +1190,20 @@ const Book = () => {
                           </div>
 
                           {deleteGenreWarningVisible[genre.genreId] && (
-                              <div
-                                className="delete-warning"
-                                ref={deleteGenreWarningRef}
-                              >
-                                <img src={warningIcon} alt="warning" />
-                                <h4>Are you sure?</h4>
-                                <p>Do you really want to delete the genre?</p>
-                                <div className="delete-warning-buttons">
-                                  <button
-                                    className="delete-warning-cancel-button button empty"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setDeleteGenreWarningVisible({});
-                                    }}
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    className="delete-warning-delete-button button red"
-                                    onClick={(e) => {
-                                      handleDeleteUserGenre(e, genre.genreId);
-                                      setDeleteGenreWarningVisible({});
-                                    }}
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              </div>
+                              <DeleteWarning
+                              ref={deleteGenreWarningRef}
+                              onCancel={(e) => {
+                                e.stopPropagation();
+                                setDeleteGenreWarningVisible({});
+                              }}
+                              onDelete={(e) => {
+                                handleDeleteUserGenre(e, genre.genreId);
+                                setDeleteGenreWarningVisible({});
+                              }}
+                              message={
+                                "Do you really want to delete the genre?"
+                              }
+                            />
                             )}
                         </div>
                       );
@@ -1477,15 +1448,16 @@ const Book = () => {
       </button>
 
       {deleteBookWarningVisible && (
-        <div className="delete-warning" ref={deleteBookWarningRef}>
-          <img src={warningIcon} alt="warning" />
-          <h4>Are you sure?</h4>
-          <p>Do you really want to delete the book? This process cannot be undone</p>
-          <div className="delete-warning-buttons">
-            <button className="delete-warning-cancel-button button empty" onClick={() => {toggleDropdownOrForm(setDeleteBookWarningVisible)}} >Cancel</button>
-            <button className="delete-warning-delete-button button red" onClick={handleDelete}>Delete</button>
-          </div>
-        </div>
+         <DeleteWarning
+         ref={deleteBookWarningRef}
+         setVisible={setDeleteAuthorWarningVisible}
+         onCancel={() => {toggleDropdownOrForm(setDeleteBookWarningVisible)}}
+         onDelete={handleDelete}
+         message={
+           "Do you really want to delete the book? This action cannot be undone"
+         }
+       />
+    
       )}
 
       <div
@@ -1498,6 +1470,8 @@ const Book = () => {
 
 export const bookLoader = async ({params}) => {
     try {
+        
+       const user = JSON.parse(localStorage.getItem("user"));
         const config = {withCredentials: true}; 
         const bookId = params.bookId;
         const bookRes = await getBook(config, bookId, user.userId);

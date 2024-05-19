@@ -364,3 +364,37 @@ export function updateUserVerifiedStatus(status, userId) {
         SET verified = ? WHERE userId = ?
     `, [status, userId]);
 }
+
+export async function deleteUser(userId) {
+    await pool.execute(`
+        DELETE FROM bookgenres
+        WHERE bookId IN (SELECT bookId FROM books WHERE userId = ?)
+        OR genreId IN (SELECT genreId FROM genres WHERE userId = ?)
+    `, [userId, userId]);
+
+    await pool.execute(`
+        DELETE FROM bookauthors
+        WHERE authorId IN (SELECT authorId FROM authors WHERE userId = ?)
+         OR bookId IN (SELECT bookId FROM books WHERE userId = ?)
+    `, [userId, userId]);
+    
+    await pool.execute(`
+        DELETE FROM genres
+        WHERE userId = ?
+    `, [userId]);
+
+    await pool.execute(`
+      DELETE FROM authors
+      WHERE userId = ?
+    `, [userId]);
+
+    await pool.execute(`
+      DELETE FROM books
+      WHERE userId = ?
+    `, [userId]);
+
+    return pool.execute(`
+        DELETE FROM users
+        WHERE userId = ? 
+    `, [userId]);
+}

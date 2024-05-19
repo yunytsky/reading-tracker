@@ -75,8 +75,11 @@
     border: 1px solid $black-10;
 }
 
+
+
 .add-book-form-buttons{
     text-align: center;
+    @include button-2;
     .button{
         margin: 0 auto;
         padding: 6px 24px;

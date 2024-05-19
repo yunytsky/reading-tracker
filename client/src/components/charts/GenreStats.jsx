@@ -112,16 +112,14 @@ const GenreStats = () => {
       ],
   };
 
-
-
   return (
     <>
-      {data.length > 0 ? (
+      {data.length === 0 || data.every((value) => value == 0) ? (
+        <div className="data-empty">No finished books</div>
+      ) : (
         <div className="chart doughnut-chart">
           <Doughnut options={options} data={chartData} />
         </div>
-      ) : (
-        <div className="data-empty">No finished books</div>
       )}
     </>
   );

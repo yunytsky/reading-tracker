@@ -240,7 +240,7 @@ body {
   }
 }
 
-.login, .signup, .verification{
+.login, .signup, .verification, .reset-password-initial{
   padding: 3em 2em;
   display: flex;
   flex-direction: column;
@@ -249,6 +249,10 @@ body {
   h3{
     margin-bottom: 1.5em;
   }
+}
+
+.reset-password-initial{
+  padding-top: 5em;
 }
 
 .verification{

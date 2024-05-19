@@ -81,7 +81,7 @@ const LoginForm = () => {
           <span className="form-error">{formik.errors.password}</span>
         )}
 
-        <Link to={"restore-password-verification"} className="forgot-password-button" type="button">
+        <Link to={"/reset-password"} className="forgot-password-button" type="button">
           Forgot password?
         </Link>
 

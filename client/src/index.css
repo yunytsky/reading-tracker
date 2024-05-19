@@ -402,15 +402,19 @@ body {
   color: #40404A;
 }
 
-.login, .signup, .verification {
+.login, .signup, .verification, .reset-password-initial {
   padding: 3em 2em;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-.login h3, .signup h3, .verification h3 {
+.login h3, .signup h3, .verification h3, .reset-password-initial h3 {
   margin-bottom: 1.5em;
+}
+
+.reset-password-initial {
+  padding-top: 5em;
 }
 
 .verification {
@@ -830,6 +834,9 @@ body {
 
 .add-book-form-buttons {
   text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
 }
 .add-book-form-buttons .button {
   margin: 0 auto;
@@ -1412,8 +1419,13 @@ body {
   max-width: 85%;
 }
 
+.delete-warning-buttons {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
 .delete-warning-buttons .button {
-  padding: 4px 18px;
+  padding: 6px 24px;
   margin-right: 1em;
 }
 .delete-warning-buttons .button:last-child {
@@ -1543,7 +1555,7 @@ body {
   margin: -1.25em 0 1em 0;
 }
 
-.profile-avatars-form {
+.profile-avatars-form, .delete-account-form {
   display: flex;
   flex-direction: column;
   background-color: #fff;
@@ -1557,10 +1569,56 @@ body {
   border: 1px solid #E6E6E7;
   padding: 1em 0;
 }
-.profile-avatars-form h5 {
+.profile-avatars-form h5, .delete-account-form h5 {
   font-weight: 500;
-  margin-bottom: 1em;
+  margin-bottom: 1.5em;
   text-align: center;
+}
+
+.delete-account-form {
+  align-items: center;
+  padding: 2em;
+}
+.delete-account-form p {
+  max-width: 80%;
+  margin-bottom: 1.5em;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #40404A;
+  text-align: center;
+}
+
+.delete-account-form-error {
+  color: #F9455A;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin-top: -1.5em;
+  margin: -1.5em 0 1.5em 0;
+}
+
+.delete-account-form-input-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+.delete-account-form-input-wrapper .delete-account-form-label {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #808086;
+}
+
+.delete-account-form-buttons {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.delete-account-form-buttons .button {
+  margin: 0 auto;
+  padding: 6px 24px;
+  margin-right: 1em;
+}
+.delete-account-form-buttons .button:last-child {
+  margin-right: 0;
 }
 
 .profile-avatars-form-avatars {

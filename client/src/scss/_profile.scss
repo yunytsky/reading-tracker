@@ -120,7 +120,7 @@
     margin: -1.25em 0 1em 0;
 }
 
-.profile-avatars-form{
+.profile-avatars-form, .delete-account-form{
     display: flex;
     flex-direction: column;
     background-color: $white;
@@ -135,8 +135,48 @@
     padding: 1em 0;
     h5{
         @include medium;
-        margin-bottom: 1em;
+        margin-bottom: 1.5em;
         text-align: center;
+    }
+}
+.delete-account-form{
+    align-items: center;
+    padding: 2em;
+    p{
+        max-width: 80%;
+        margin-bottom: 1.5em;
+        @include body-2;
+        color: $black-75;
+        text-align: center;
+    }
+}
+
+.delete-account-form-error{
+    color: $red;
+    @include body-3;
+    margin-top: -1.5em;
+    margin: -1.5em 0 1.5em 0;
+}
+
+.delete-account-form-input-wrapper{
+    display: flex;
+    flex-direction: column;
+    .delete-account-form-label{
+        @include body-3;
+        color: $black-50;
+    }
+}
+
+.delete-account-form-buttons{
+    text-align: center;
+    @include button-2;
+    .button{
+        margin: 0 auto;
+        padding: 6px 24px;
+        margin-right: 1em;
+        &:last-child{
+            margin-right: 0;
+        }
     }
 }
 

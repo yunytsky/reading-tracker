@@ -44,3 +44,23 @@ export const userInfoSchema = yup.object().shape({
     .oneOf([yup.ref("password"), null], "Passwords don't match")
 });
 
+export const emailSchema = yup.object().shape({
+  email:  yup.string().email("Invalid email").required("Required")
+})
+
+export const passwordSchema = yup.object().shape({
+  password:  yup.string().required("Required")
+})
+
+export const restorePasswordSchema = yup.object().shape({
+  password: yup
+  .string()
+  .min(6, "Password must contain at least 6 characters")
+  .matches(/[a-z]/, "Password must contain at least 1 small letter")
+  .matches(/\d/, "Password mut contain at least 1 digit")
+  .required("Required"),
+passwordConfirmation: yup
+  .string()
+  .oneOf([yup.ref("password"), null], "Passwords don't match")
+  .required("Required")
+})

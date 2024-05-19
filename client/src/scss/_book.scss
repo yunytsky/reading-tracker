@@ -287,8 +287,9 @@
 }
 
 .delete-warning-buttons{
+    @include button-2;
     .button{
-        padding: 4px 18px;
+        padding: 6px 24px;
         margin-right: 1em;
         &:last-child{
             margin-right: 0;

@@ -43,8 +43,12 @@ export const verifyAccount = (data, config) => {
   return instance.patch(`/auth/verify`, data, config);
 };
 
-export const resendVerificationCode = (data, config) => {
-  return instance.post(`/auth/resend-verification-code`, data, config);
+export const sendVerificationCode = (data, config) => {
+  return instance.post(`/auth/send-verification-code`, data, config);
+}
+
+export const deleteAccount = (data, config) => {
+  return instance.delete(`/auth/account`, {...config, data});
 }
 
 export const updateUserCountry = (data, config, userId) => {

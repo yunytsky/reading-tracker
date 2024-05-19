@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Main from "./views/Main";
 import AccountVerification from "./views/AccountVerification";
 import ResetPasswordVerification from "./views/ResetPasswordVerification";
+import ResetPasswordInitial from "./views/ResetPasswordInitial";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -21,6 +22,7 @@ const router = createBrowserRouter(
       <Route path="login" element={<Login/>}/>
       <Route path="signup" element={<Signup/>}/>
       <Route path="account-verification" element={<AccountVerification/>}/>
+      <Route path="reset-password" element={<ResetPasswordInitial/>}/>
       <Route path="reset-password-verification" element={<ResetPasswordVerification/>}/>
 
       <Route element={<ProtectedRoute/>}>

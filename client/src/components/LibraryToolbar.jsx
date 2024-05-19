@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { addBook } from "../api";
 import { useNavigate } from "react-router-dom";
 import arrowIcon from "../assets/arrow.svg";
+import { AuthContext } from "../context/AuthContext";
 const LibraryToolbar = ({
   allYears,
   allStatuses,
@@ -11,6 +12,7 @@ const LibraryToolbar = ({
   setSelectedStatuses,
 }) => {
   const navigate = useNavigate();
+  const {user} = useContext(AuthContext);
 
   const [addBookFormVisible, setAddBookFormVisible] = useState(false);
   const [bookName, setBookName] = useState("");
@@ -48,7 +50,9 @@ const LibraryToolbar = ({
       setAddBookFormVisible(false);
 
       navigate(`/library/book/${res.data.book}`);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   //Restrict screen height when overlay is visible
@@ -84,6 +88,7 @@ const LibraryToolbar = ({
         !addBookButtonRef.current.contains(event.target)
       ) {
         setAddBookFormVisible(false);
+        setBookName("");
         setBookNameError(false);
       }
 
@@ -351,6 +356,7 @@ const LibraryToolbar = ({
               type="button"
               className="button empty"
               onClick={() => {
+                setBookName("");
                 setAddBookFormVisible((prevVisible) => !prevVisible);
               }}
             >

@@ -1,9 +1,10 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { changeUserAvatar, changeUserPassword, getAvatars, updateUserCountry } from "../api";
+import { changeUserAvatar, changeUserPassword, deleteAccount, getAvatars, updateUserCountry } from "../api";
 import { useFormik } from "formik";
-import { userInfoSchema } from "../schemas";
+import { passwordSchema, userInfoSchema } from "../schemas";
+import DeleteWarning from "../components/DeleteWarning";
 
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -23,6 +24,13 @@ const Profile = () => {
   const [avatarsFormVisible, setAvatarsFormVisible] = useState(false);
   const avatarsFormRef = useRef(null);
   const [selectedAvatarId, setSelectedAvatarId] = useState(null);
+
+  const [deleteAccountFormVisible, setDeleteAccountFormVisible] = useState(false);
+  const [deleteAccountConfirmationVisible, setDeleteAccountConfirmationVisible] = useState(false);
+  const [deleteAccountFormError, setDeleteAccountFormError] = useState({error: false, message: ""});
+  const deleteAccountFormRef = useRef(null);
+  const deleteAccountConfirmationRef = useRef(null);
+
 
   //Fetch flags and avatars
   useEffect(() => {
@@ -159,7 +167,7 @@ const Profile = () => {
    //Restrict screen height when overlay is visible
    useEffect(() => {
     const handleBodyStyles = () => {
-      if (avatarsFormVisible) {
+      if (avatarsFormVisible || deleteAccountConfirmationVisible || deleteAccountFormVisible) {
         window.scrollTo(0, 0);
         document.body.style.height = "100vh";
         document.body.style.overflow = "hidden";
@@ -172,7 +180,7 @@ const Profile = () => {
       document.body.style.height = "auto";
       document.body.style.overflow = "visible";
     };
-  }, [avatarsFormVisible]);
+  }, [avatarsFormVisible, deleteAccountConfirmationVisible, deleteAccountFormVisible]);
 
   //Hide popup-form/dropdown-menu when clicked elsewhere
   useEffect(() => {
@@ -183,6 +191,19 @@ const Profile = () => {
         ) {
           setAvatarsFormVisible(false);
         }
+
+        if(deleteAccountConfirmationRef.current !== null &&
+          !deleteAccountConfirmationRef.current.contains(event.target)
+        ){
+          setDeleteAccountConfirmationVisible(false);
+        }
+
+        if(deleteAccountFormRef.current !== null &&
+          !deleteAccountFormRef.current.contains(event.target)
+        ){
+          formikDeleteAccount.resetForm();
+          setDeleteAccountFormVisible(false);
+        }
       };
 
       document.addEventListener("mousedown", handleClickOutside);
@@ -191,6 +212,27 @@ const Profile = () => {
       };
   }, []);
 
+  const handleDeleteAccount = async (values, actions) => {
+    try {
+      if(deleteAccountFormError.error){
+        setDeleteAccountFormError({error: false, message: ""});
+      }
+
+      const config = {withCredentials: true};
+      const res = await deleteAccount({password: values.password}, config);
+      
+      actions.resetForm();
+      setUser(null);
+      localStorage.removeItem("user");
+      
+    } catch (error) {
+      if(error.response && error.response.status == 400 && error.response.data.message){
+        setDeleteAccountFormError({error: true, message: error.response.data.message})
+      }else{
+        setDeleteAccountFormError({error: true, message: "Internal server error, try again later"})
+      }
+    }
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -203,6 +245,14 @@ const Profile = () => {
     validationSchema: userInfoSchema,
     onSubmit: onSubmit,
   });
+
+  const formikDeleteAccount = useFormik({
+    initialValues: {
+      password: ""
+    },
+    validationSchema: passwordSchema,
+    onSubmit: handleDeleteAccount,
+  })
 
   return (
     <div className="profile">
@@ -234,7 +284,9 @@ const Profile = () => {
                     }
                     src={`http://localhost:3000/img/avatars/${avatar.path}`}
                     alt={avatar.path}
-                    onClick={()=> {setSelectedAvatarId(avatar.avatarId)}}
+                    onClick={() => {
+                      setSelectedAvatarId(avatar.avatarId);
+                    }}
                   />
                 ))}
               </div>
@@ -417,16 +469,104 @@ const Profile = () => {
             <button
               className="profile-delete-button delete-button"
               type="button"
+              onClick={() => {
+                setDeleteAccountConfirmationVisible(true);
+              }}
             >
               Delete my account
             </button>
           </form>
+
+          {deleteAccountFormVisible && (
+            <form
+              className="delete-account-form"
+              ref={deleteAccountFormRef}
+              onSubmit={formikDeleteAccount.handleSubmit}
+            >
+              <h5>Enter your password to proceed</h5>
+              {/* Password */}
+              <div className="delete-account-form-input-wrapper">
+                <label
+                  className="delete-account-form-label form-label"
+                  htmlFor="password"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  className="form-input"
+                  onInput={() => {if(deleteAccountFormError){setDeleteAccountFormError({error:false, message: ""})}}}
+                  onChange={formikDeleteAccount.handleChange}
+                  value={formikDeleteAccount.values.password}
+                />
+
+                {/* Password error */}
+                {formikDeleteAccount.errors.password &&
+                  formikDeleteAccount.touched.password && (
+                    <span className="profile-info-error">
+                      {formikDeleteAccount.errors.password}
+                    </span>
+                  )}
+
+                {deleteAccountFormError.error && (
+                  <div className="delete-account-form-error">
+                    {deleteAccountFormError.message}
+                  </div>
+                )}
+              </div>
+
+              <p>
+                This action is irreversible, you cannot restore your account
+                once you clicked Delete button
+              </p>
+
+              <div className="delete-account-form-buttons">
+                <button
+                  type="button"
+                  className="button empty"
+                  onClick={() => {
+                    setDeleteAccountFormVisible(false);
+                    formikDeleteAccount.resetForm();
+                  }}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="button red">
+                  Delete
+                </button>
+              </div>
+            </form>
+          )}
+
+          {deleteAccountConfirmationVisible && (
+            <DeleteWarning
+              message={
+                "Do you really want to delete your account? This action cannot be undone"
+              }
+              onDelete={() => {
+                setDeleteAccountConfirmationVisible(false);
+                setDeleteAccountFormVisible(true);
+              }}
+              onCancel={() => {
+                setDeleteAccountConfirmationVisible(false);
+              }}
+              ref={deleteAccountConfirmationRef}
+            />
+          )}
         </>
       )}
 
       <div
         id="overlay"
-        style={avatarsFormVisible ? { display: "block" } : { display: "none" }}
+        style={
+          avatarsFormVisible ||
+          deleteAccountFormVisible ||
+          deleteAccountConfirmationVisible
+            ? { display: "block" }
+            : { display: "none" }
+        }
       ></div>
     </div>
   );
