@@ -1,8 +1,9 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { addBook } from "../api";
+import { addBook, getBook, getBooks, getBooksGenres, getUserAuthors, getUserGenres } from "../api";
 import { useNavigate } from "react-router-dom";
 import arrowIcon from "../assets/arrow.svg";
 import { AuthContext } from "../context/AuthContext";
+import downloadIcon from "../assets/download.svg";
 const LibraryToolbar = ({
   allYears,
   allStatuses,
@@ -54,6 +55,54 @@ const LibraryToolbar = ({
       console.log(error)
     }
   };
+
+  const handleGetJSON = async () => {
+    try {
+      let books = [];
+
+      const config = {withCredentials: true};
+      const booksRes = await getBooks(config, user.userId);
+
+      const bookPromises = booksRes.data.books.map(async (obj) => {
+      const bookRes = await getBook(config, obj.bookId, user.userId);
+      const bookData = bookRes.data.book;
+      const bookAuthorsData = bookRes.data.bookAuthors;
+      const bookGenresData = bookRes.data.bookGenres;
+
+      delete bookData.userId;
+
+      bookAuthorsData.forEach((bookAuthor) => {
+        delete bookAuthor.authorId;
+        delete bookAuthor.userId;
+        delete bookAuthor.color;
+      });
+      bookGenresData.forEach((bookGenre) => {
+        delete bookGenre.genreId;
+        delete bookGenre.userId;
+        delete bookGenre.color;
+      });
+
+      const book = { ...bookData, authors: bookAuthorsData, genres: bookGenresData };
+      return book;
+    });
+
+      const resolvedBooks = await Promise.all(bookPromises);
+
+    // Add resolved books to the books array
+      books.push(...resolvedBooks);
+
+      const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+        JSON.stringify(books, null, 2)
+      )}`;
+      const link = document.createElement("a");
+      link.href = jsonString;
+      link.download = "books.json";
+  
+      link.click();
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   //Restrict screen height when overlay is visible
   useEffect(() => {
@@ -312,6 +361,11 @@ const LibraryToolbar = ({
         </div>
       </div>
       <div className="buttons">
+        <button className="get-json-button" onClick={handleGetJSON}>
+          <img src={downloadIcon} alt="download icon" />
+          <span>Get JSON</span>
+        </button>
+
         <button
           className="button"
           ref={addBookButtonRef}

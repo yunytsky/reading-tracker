@@ -1,4 +1,7 @@
 import { getUserBooks, getUserBook, addBookEntry, editBookEntry, getBookOwner, deleteBookEntry, getBookEntryAuthors, getUserAuthors, addUserAuthor, deleteBookEntryAuthor, addBookEntryAuthor, deleteUserAuthor, deleteBookEntriesAuthors, editUserAuthor, getUserGenres, deleteBookEntryGenre, addBookEntryGenre, editUserGenre, deleteBookEntriesGenres, addUserGenre, deleteUserGenre, getBookEntriesGenres, getBookEntryGenres, getFinishedBooksYears, deleteBookEntryGenres, deleteBookEntryAuthors } from "../database/functions.js";
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 export async function getBooks(req, res) {
     try {

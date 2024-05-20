@@ -137,6 +137,15 @@ export function getUserBooks(userId, filter) {
     `, [userId]);
 }
 
+// export function getBooks(bookIds){
+//     const placeholders = authorIds.map(() => '?').join(', ');
+
+//     return pool.execute(`
+//     SELECT * FROM books 
+//     WHERE bookId IN ${placeholders} 
+// `, bookIds);
+// }
+
 export function getUserBook(userId, bookId) {
     return pool.execute(`
         SELECT * FROM books 
