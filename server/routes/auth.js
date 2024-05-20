@@ -1,5 +1,5 @@
 import express from "express";
-import { signup, login, logout, changePassword, sendVerificationCode, verifyAccount, deleteAccount, confirmPasswordReset, resetPassword, changeEmail } from "../controllers/auth.js";
+import { signup, login, logout, changePassword, sendVerificationCode, verifyAccount, deleteAccount, confirmPasswordReset, resetPassword, changeEmail, checkIfEmailTaken } from "../controllers/auth.js";
 import { verifyJWT } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -14,6 +14,8 @@ router.patch("/verify", verifyJWT, verifyAccount);
 router.patch("/confirm-password-reset", confirmPasswordReset);
 router.patch("/reset-password", resetPassword);
 router.patch("/change-email", verifyJWT, changeEmail);
+
+router.get("/email-taken", checkIfEmailTaken);
 
 
 router.delete("/account", verifyJWT, deleteAccount);

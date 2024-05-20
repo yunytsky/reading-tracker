@@ -5,6 +5,7 @@ import {
   changeUserAvatar,
   changeUserEmail,
   changeUserPassword,
+  checkIfEmailTaken,
   deleteAccount,
   getAvatars,
   sendVerificationCode,
@@ -34,6 +35,8 @@ const Profile = () => {
   ] = useState(false);
   const [passwordUpdatedMessageVisible, setPasswordUpdatedMessageVisible] =
     useState(false);
+  
+  const [emailTakenError, setEmailTakenError] = useState(false);
 
   const [avatarsFormVisible, setAvatarsFormVisible] = useState(false);
   const avatarsFormRef = useRef(null);
@@ -321,12 +324,17 @@ const Profile = () => {
 
       //Update email
       if (user.email != values.email) {
-        const res = await sendVerificationCode(
-          { email: values.email, type: "email-change" },
-          config
-        );
-
-        setVerifyEmailChangeFormVisible(true);
+        const res = await checkIfEmailTaken(values.email, {});
+        if(res.data.taken){
+          setEmailTakenError(true);
+        }else{
+          await sendVerificationCode(
+            { email: values.email, type: "email-change" },
+            config
+          );
+  
+          setVerifyEmailChangeFormVisible(true);
+        }
       }
 
       //Update email
@@ -570,11 +578,15 @@ const Profile = () => {
               name="email"
               id="email"
               value={formik.values.email}
-              onChange={formik.handleChange}
+              onChange={(e) => {formik.handleChange(e); if(emailTakenError){setEmailTakenError(false)}}}
             />
 
             {formik.errors.email && formik.touched.email && (
               <span className="profile-info-error">{formik.errors.email}</span>
+            )}
+
+            {emailTakenError && (
+              <span className="profile-info-error">Email is already taken</span>
             )}
 
             {/* Current password */}
@@ -700,9 +712,9 @@ const Profile = () => {
               </div>
               <h4>Check your email</h4>
               <p>
-                Code has been sent to {formik.values.email}. Enter below to change your
-                password. In case code is not entered, changes will not be
-                applied
+                Code has been sent to {formik.values.email}. Enter below to
+                change your password. In case code is not entered, changes will
+                not be applied
               </p>
               <div
                 className={
@@ -861,7 +873,20 @@ const Profile = () => {
               <div className="verification-buttons">
                 <button
                   className="verification-cancel-button button empty"
-                  onClick={() => {setVerifyEmailChangeFormVisible(false); if(verificationError){setVerificationError({error: false, message: "", type: ""})}}}
+                  onClick={() => {
+                    setVerifyEmailChangeFormVisible(false);
+                    if (verificationError) {
+                      setVerificationError({
+                        error: false,
+                        message: "",
+                        type: "",
+                      });
+                    }
+                    if(emailTakenError){
+                      setEmailTakenError(false);
+                    }
+                    formik.values.email = user.email;
+                  }}
                 >
                   Cancel
                 </button>

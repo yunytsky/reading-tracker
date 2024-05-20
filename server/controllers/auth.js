@@ -103,15 +103,32 @@ export async function updateEmail(req, res) {
     }
 }
 
+export async function checkIfEmailTaken(req, res){
+    try {
+        if(!req.query.email){
+            return res.status(400).json({ error: true, message: "No email provided"})
+        }
+        const [userData] = await findByEmail(req.query.email);
+        const user = userData[0];
+        if(user){
+            return res.status(200).json({ error: false, message: "", taken: true })
+        }else{
+            return res.status(200).json({ error: false, message: "", taken: false })
+        }
+    } catch (error) {
+        return res.status(500).json({ error: true, message: error.message })
+
+    }
+}
+
 export async function sendVerificationCode (req, res) {
     try{
         await sendCode(req.body.email, req.body.type); 
        
         return res.status(200).json({ error: false, message: "Verification code has been sent" })
 
-    }catch(err) {
-        console.log(err)
-       return res.status(500).json({ error: false, message: err.message })
+    }catch(error) {
+       return res.status(500).json({ error: true, message: error.message })
     }
 }
 
@@ -201,9 +218,12 @@ export async function resetPassword(req, res) {
         }else{            
             //Update password
             const [userData] = await findByEmail(req.body.email);
+            console.log(req.body.email)
             const user = userData[0];
+            console.log(user)
+
             const password = await generatePassword(req.body.password);
-            await changeUserPassword(password, us);
+            await changeUserPassword(password, user.userId);
 
             //Delete verification instance
             await deleteVerificationInstance(verificationInstance.verificationId);

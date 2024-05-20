@@ -27,6 +27,10 @@ instance.interceptors.response.use(
 );
 
 
+export const checkIfEmailTaken = (email, config) => {
+  return instance.get(`/auth/email-taken?email=${email}`,config);
+};
+
 export const login = (data, config) => {
   return instance.post(`/auth/log-in`, data, config);
 };
@@ -153,3 +157,5 @@ export const getBooksGenres = (config, userId) => {
 export const getYearRange = (config, userId) => {
   return instance.get(`/users/${userId}/library/books/years`, config);
 }
+
+
