@@ -200,7 +200,6 @@ export async function confirmPasswordReset(req,res) {
 
 
     } catch (error) {
-        console.log(error)
         return res.status(500).json({ error: true, message: error.message });
 
     }
@@ -218,9 +217,7 @@ export async function resetPassword(req, res) {
         }else{            
             //Update password
             const [userData] = await findByEmail(req.body.email);
-            console.log(req.body.email)
             const user = userData[0];
-            console.log(user)
 
             const password = await generatePassword(req.body.password);
             await changeUserPassword(password, user.userId);
@@ -231,9 +228,7 @@ export async function resetPassword(req, res) {
             return res.status(200).json({error: false, message: "Password has been successfully reset"});
         }
     } catch (error) {
-        console.log(error)
         return res.status(500).json({ error: true, message: error.message });
-
     }
 }
 
@@ -257,7 +252,6 @@ export async function changeEmail(req, res) {
         }
       
     } catch (error) {
-        console.log(error)
         return res.status(500).json({ error: true, message: error.message });
 
     }
